@@ -25,11 +25,9 @@
         
         .dimmed { opacity: 0.5; filter: grayscale(80%); } 
         
-        /* Hide scrollbar untuk filter Pills */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Animasi Neon VAPEBOSS */
         .neon-marquee-container {
             width: 100%; overflow: hidden; background-color: #000;
             padding: 15px 0; border-radius: 12px; border: 3px solid #333;
@@ -41,7 +39,6 @@
         }
         @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
         
-        /* Animasi Tombol Mengambang */
         .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
         .fade-enter-from, .fade-leave-to { opacity: 0; }
     </style>
@@ -100,7 +97,15 @@
 
                 <!-- BATCH SUMMARY -->
                 <div v-if="currentView === 'batch'">
-                    <div v-for="(batch, index) in rawData" :key="index" @click="goToPicking(batch)" class="clickable-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-4">
+                    <div v-for="(batch, index) in rawData" :key="index" @click="goToPicking(batch)" class="clickable-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-4 relative" :class="{'opacity-70': isBatchCompleted(batch['Batch'])}">
+                        
+                        <!-- STEMPEL SELESAI -->
+                        <div v-if="isBatchCompleted(batch['Batch'])" class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+                            <div class="bg-emerald-500 text-white font-black px-6 py-2 rounded-lg rotate-[-12deg] border-4 border-emerald-600 shadow-xl text-2xl tracking-widest drop-shadow-md opacity-90">
+                                SELESAI
+                            </div>
+                        </div>
+
                         <div class="bg-slate-900 text-white px-4 py-3 flex justify-between items-center">
                             <h3 class="font-black text-lg">BATCH {{ batch['Batch'] }}</h3>
                             <span class="text-[9px] font-semibold bg-slate-700 px-2 py-1 rounded-full text-right max-w-[130px] truncate">{{ batch['Shift'] }}</span>
@@ -118,7 +123,7 @@
                             <div><p class="text-[7px] text-gray-500 font-bold uppercase">T.Identik</p><p class="text-[11px] font-black text-gray-800">{{ batch['Tidak Identik (1 Item)'] }}</p></div>
                         </div>
                         <div class="bg-emerald-50 py-2.5 text-center border-t border-emerald-200">
-                            <span class="text-emerald-700 font-bold text-xs flex justify-center items-center gap-1">📦 Mulai Ambil ({{ batch['Total SKU'] }} SKU)</span>
+                            <span class="text-emerald-700 font-bold text-xs flex justify-center items-center gap-1">📦 Buka Batch ({{ batch['Total SKU'] }} SKU)</span>
                         </div>
                     </div>
                 </div>
@@ -127,9 +132,8 @@
 
         <!-- ================= HALAMAN PICKING (HIGH DENSITY UI) ================= -->
         <div v-if="currentView === 'picking'" class="flex-1 pb-24 relative z-20">
-            <!-- 1. FREEZE PANEL: Navigasi, Progress, Toko, Tab, Filter -->
+            <!-- FREEZE PANEL -->
             <div class="sticky top-0 z-30 flex flex-col shadow-md">
-                
                 <!-- Nav & Progress -->
                 <div class="bg-slate-900 text-white px-3 py-2">
                     <div class="flex items-center justify-between mb-1.5">
@@ -147,7 +151,7 @@
                     </div>
                 </div>
 
-                <!-- Nama Toko (Tanpa T1-T4, Padat) -->
+                <!-- Nama Toko Kapsul -->
                 <div v-if="selectedBatchData && !loading" class="bg-white px-2 py-1.5 grid grid-cols-2 gap-1 border-b border-gray-200">
                     <div v-if="selectedBatchData['Toko 1 (merah)'] !== '-'" class="bg-red-50 text-red-900 text-[9px] font-bold px-1.5 py-1 rounded border border-red-200 text-center truncate">{{ selectedBatchData['Toko 1 (merah)'] }}</div>
                     <div v-if="selectedBatchData['Toko 2 (hijau)'] !== '-'" class="bg-emerald-50 text-emerald-900 text-[9px] font-bold px-1.5 py-1 rounded border border-emerald-200 text-center truncate">{{ selectedBatchData['Toko 2 (hijau)'] }}</div>
@@ -155,7 +159,7 @@
                     <div v-if="selectedBatchData['Toko 4 (biru)'] !== '-'" class="bg-blue-50 text-blue-900 text-[9px] font-bold px-1.5 py-1 rounded border border-blue-200 text-center truncate">{{ selectedBatchData['Toko 4 (biru)'] }}</div>
                 </div>
 
-                <!-- Tab Status (Belum / Selesai) -->
+                <!-- Tab Status -->
                 <div v-if="!loading" class="bg-gray-100 flex text-[10px] font-bold border-b border-gray-200">
                     <button @click="activeTab = 'BELUM'" class="flex-1 py-1.5 transition-colors" :class="activeTab === 'BELUM' ? 'bg-white text-emerald-600 border-b-2 border-emerald-500' : 'text-gray-500'">BELUM ({{ pickingData.length - pickedCount }})</button>
                     <button @click="activeTab = 'SELESAI'" class="flex-1 py-1.5 transition-colors" :class="activeTab === 'SELESAI' ? 'bg-white text-emerald-600 border-b-2 border-emerald-500' : 'text-gray-500'">SELESAI ({{ pickedCount }})</button>
@@ -170,7 +174,6 @@
                 </div>
             </div>
 
-            <!-- Loading Spinner -->
             <div v-if="loading" class="flex flex-col items-center justify-center pt-20">
                 <div class="animate-spin w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full mb-3"></div>
                 <p class="text-gray-500 text-sm font-medium">Memuat data...</p>
@@ -180,66 +183,67 @@
             <div v-if="!loading" class="p-2 space-y-2">
                 <div v-for="(item, index) in filteredPickingData" :key="item['Nama Barang']" class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col overflow-hidden" :class="{ 'dimmed': isPicked(item['Nama Barang']) }">
                     <div class="flex">
-                        <!-- Kiri: Info -->
+                        
+                        <!-- Kiri: Info & Kuantitas -->
                         <div class="p-2 flex-1 border-r border-gray-100 flex flex-col justify-center">
-                            <!-- Kategori & Total Sejajar -->
                             <div class="flex justify-between items-center mb-1">
                                 <span class="text-[9px] font-black text-gray-400 uppercase tracking-wider bg-gray-100 px-1.5 py-0.5 rounded">{{ item['Kategori'] }}</span>
                                 <span class="text-[9px] font-black text-slate-800 bg-[#d4e157] px-1.5 py-0.5 rounded">TOTAL: {{ item.qtyT1 + item.qtyT2 + item.qtyT3 + item.qtyT4 }}</span>
                             </div>
-                            <!-- Nama Barang -->
                             <h2 class="text-xs font-bold text-gray-900 leading-tight mb-2">{{ item['Nama Barang'] }}</h2>
                             
-                            <!-- Kuantitas Kotak Kecil -->
-                            <div class="flex flex-wrap gap-1">
-                                <div v-if="item['Toko 1 (merah)'] > 0" class="bg-red-50 text-red-900 border border-red-200 rounded px-1.5 py-0.5 min-w-[28px] text-center">
+                            <!-- Grid Kuantitas Toko & Tombol Edit -->
+                            <div class="flex flex-wrap gap-1 items-stretch">
+                                <!-- Toko 1 -->
+                                <div v-if="item['Toko 1 (merah)'] > 0" class="bg-red-50 text-red-900 border border-red-200 rounded px-1.5 py-0.5 min-w-[26px] text-center flex flex-col justify-center">
                                     <div v-if="!item.editMode">
-                                        <span class="text-[11px] font-black block leading-none mt-0.5" :class="{'text-red-300 line-through text-[9px]': item.qtyT1 !== item['Toko 1 (merah)']}">{{ item['Toko 1 (merah)'] }}</span>
-                                        <span v-if="item.qtyT1 !== item['Toko 1 (merah)']" class="text-[11px] font-black text-red-700 block leading-none">{{ item.qtyT1 }}</span>
+                                        <span class="text-[11px] font-black block leading-none" :class="{'text-red-300 line-through text-[9px]': item.qtyT1 !== item['Toko 1 (merah)']}">{{ item['Toko 1 (merah)'] }}</span>
+                                        <span v-if="item.qtyT1 !== item['Toko 1 (merah)']" class="text-[11px] font-black text-red-700 block leading-none mt-0.5">{{ item.qtyT1 }}</span>
                                     </div>
-                                    <div v-else class="flex items-center justify-between gap-1 mt-0.5"><button @click.stop="item.qtyT1 > 0 ? item.qtyT1-- : null" class="bg-red-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT1 }}</span><button @click.stop="item.qtyT1++" class="bg-red-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
+                                    <div v-else class="flex items-center justify-between gap-1"><button @click.stop="item.qtyT1 > 0 ? item.qtyT1-- : null; saveDraft()" class="bg-red-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT1 }}</span><button @click.stop="item.qtyT1++; saveDraft()" class="bg-red-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
                                 </div>
                                 
-                                <div v-if="item['Toko 2 (hijau)'] > 0" class="bg-emerald-50 text-emerald-900 border border-emerald-200 rounded px-1.5 py-0.5 min-w-[28px] text-center">
+                                <!-- Toko 2 -->
+                                <div v-if="item['Toko 2 (hijau)'] > 0" class="bg-emerald-50 text-emerald-900 border border-emerald-200 rounded px-1.5 py-0.5 min-w-[26px] text-center flex flex-col justify-center">
                                     <div v-if="!item.editMode">
-                                        <span class="text-[11px] font-black block leading-none mt-0.5" :class="{'text-emerald-300 line-through text-[9px]': item.qtyT2 !== item['Toko 2 (hijau)']}">{{ item['Toko 2 (hijau)'] }}</span>
-                                        <span v-if="item.qtyT2 !== item['Toko 2 (hijau)']" class="text-[11px] font-black text-emerald-700 block leading-none">{{ item.qtyT2 }}</span>
+                                        <span class="text-[11px] font-black block leading-none" :class="{'text-emerald-300 line-through text-[9px]': item.qtyT2 !== item['Toko 2 (hijau)']}">{{ item['Toko 2 (hijau)'] }}</span>
+                                        <span v-if="item.qtyT2 !== item['Toko 2 (hijau)']" class="text-[11px] font-black text-emerald-700 block leading-none mt-0.5">{{ item.qtyT2 }}</span>
                                     </div>
-                                    <div v-else class="flex items-center justify-between gap-1 mt-0.5"><button @click.stop="item.qtyT2 > 0 ? item.qtyT2-- : null" class="bg-emerald-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT2 }}</span><button @click.stop="item.qtyT2++" class="bg-emerald-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
+                                    <div v-else class="flex items-center justify-between gap-1"><button @click.stop="item.qtyT2 > 0 ? item.qtyT2-- : null; saveDraft()" class="bg-emerald-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT2 }}</span><button @click.stop="item.qtyT2++; saveDraft()" class="bg-emerald-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
                                 </div>
 
-                                <div v-if="item['Toko 3 (kuning)'] > 0" class="bg-yellow-50 text-yellow-900 border border-yellow-300 rounded px-1.5 py-0.5 min-w-[28px] text-center">
+                                <!-- Toko 3 -->
+                                <div v-if="item['Toko 3 (kuning)'] > 0" class="bg-yellow-50 text-yellow-900 border border-yellow-300 rounded px-1.5 py-0.5 min-w-[26px] text-center flex flex-col justify-center">
                                     <div v-if="!item.editMode">
-                                        <span class="text-[11px] font-black block leading-none mt-0.5" :class="{'text-yellow-400 line-through text-[9px]': item.qtyT3 !== item['Toko 3 (kuning)']}">{{ item['Toko 3 (kuning)'] }}</span>
-                                        <span v-if="item.qtyT3 !== item['Toko 3 (kuning)']" class="text-[11px] font-black text-yellow-700 block leading-none">{{ item.qtyT3 }}</span>
+                                        <span class="text-[11px] font-black block leading-none" :class="{'text-yellow-400 line-through text-[9px]': item.qtyT3 !== item['Toko 3 (kuning)']}">{{ item['Toko 3 (kuning)'] }}</span>
+                                        <span v-if="item.qtyT3 !== item['Toko 3 (kuning)']" class="text-[11px] font-black text-yellow-700 block leading-none mt-0.5">{{ item.qtyT3 }}</span>
                                     </div>
-                                    <div v-else class="flex items-center justify-between gap-1 mt-0.5"><button @click.stop="item.qtyT3 > 0 ? item.qtyT3-- : null" class="bg-yellow-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT3 }}</span><button @click.stop="item.qtyT3++" class="bg-yellow-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
+                                    <div v-else class="flex items-center justify-between gap-1"><button @click.stop="item.qtyT3 > 0 ? item.qtyT3-- : null; saveDraft()" class="bg-yellow-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT3 }}</span><button @click.stop="item.qtyT3++; saveDraft()" class="bg-yellow-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
                                 </div>
 
-                                <div v-if="item['Toko 4 (biru)'] > 0" class="bg-blue-50 text-blue-900 border border-blue-200 rounded px-1.5 py-0.5 min-w-[28px] text-center">
+                                <!-- Toko 4 -->
+                                <div v-if="item['Toko 4 (biru)'] > 0" class="bg-blue-50 text-blue-900 border border-blue-200 rounded px-1.5 py-0.5 min-w-[26px] text-center flex flex-col justify-center">
                                     <div v-if="!item.editMode">
-                                        <span class="text-[11px] font-black block leading-none mt-0.5" :class="{'text-blue-300 line-through text-[9px]': item.qtyT4 !== item['Toko 4 (biru)']}">{{ item['Toko 4 (biru)'] }}</span>
-                                        <span v-if="item.qtyT4 !== item['Toko 4 (biru)']" class="text-[11px] font-black text-blue-700 block leading-none">{{ item.qtyT4 }}</span>
+                                        <span class="text-[11px] font-black block leading-none" :class="{'text-blue-300 line-through text-[9px]': item.qtyT4 !== item['Toko 4 (biru)']}">{{ item['Toko 4 (biru)'] }}</span>
+                                        <span v-if="item.qtyT4 !== item['Toko 4 (biru)']" class="text-[11px] font-black text-blue-700 block leading-none mt-0.5">{{ item.qtyT4 }}</span>
                                     </div>
-                                    <div v-else class="flex items-center justify-between gap-1 mt-0.5"><button @click.stop="item.qtyT4 > 0 ? item.qtyT4-- : null" class="bg-blue-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT4 }}</span><button @click.stop="item.qtyT4++" class="bg-blue-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
+                                    <div v-else class="flex items-center justify-between gap-1"><button @click.stop="item.qtyT4 > 0 ? item.qtyT4-- : null; saveDraft()" class="bg-blue-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT4 }}</span><button @click.stop="item.qtyT4++; saveDraft()" class="bg-blue-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
                                 </div>
+                                
+                                <!-- Tombol Pemicu Laporan Kurang -->
+                                <button v-if="!item.editMode && !isPicked(item['Nama Barang'])" @click.stop="item.editMode = true" class="bg-amber-50 text-amber-600 border border-amber-200 rounded px-1.5 py-0.5 text-[9px] font-bold flex items-center gap-0.5 hover:bg-amber-100 transition-colors ml-1">
+                                    ⚠️ Fisik Kurang?
+                                </button>
+                                <button v-if="item.editMode" @click.stop="item.editMode = false; saveDraft()" class="bg-amber-500 text-white rounded px-2 py-0.5 text-[9px] font-bold flex items-center gap-1 shadow-sm ml-1">
+                                    ✅ Simpan
+                                </button>
                             </div>
                         </div>
 
-                        <!-- Kanan: Tombol Action -->
+                        <!-- Kanan: Tombol AMBIL/BATAL -->
                         <button @click="togglePick(item['Nama Barang'])" class="w-16 flex flex-col items-center justify-center transition-colors" :class="isPicked(item['Nama Barang']) ? 'bg-gray-100 text-gray-400' : 'bg-[#d4e157] hover:bg-[#cddc39] text-slate-800'">
                             <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                             <span class="text-[8px] font-black" v-text="isPicked(item['Nama Barang']) ? 'BATAL' : 'AMBIL'"></span>
-                        </button>
-                    </div>
-
-                    <!-- Panel Lapor Selisih -->
-                    <div class="bg-gray-50 py-1.5 px-2 flex justify-between items-center border-t border-gray-100">
-                        <button v-if="!item.editMode && !isPicked(item['Nama Barang'])" @click.stop="item.editMode = true" class="text-[9px] text-amber-600 font-bold flex items-center gap-1 bg-amber-50 px-1.5 py-1 rounded border border-amber-200">
-                            ⚠️ Fisik Kurang?
-                        </button>
-                        <button v-if="item.editMode" @click.stop="item.editMode = false" class="text-[9px] text-white font-bold bg-amber-500 px-3 py-1 rounded shadow-sm w-full text-center">
-                            ✅ Simpan
                         </button>
                     </div>
                 </div>
@@ -288,7 +292,10 @@
                     searchQuery: '',
                     
                     // Scroll UI
-                    showScrollTop: false
+                    showScrollTop: false,
+                    
+                    // Local Storage
+                    completedBatches: JSON.parse(localStorage.getItem('completedBatches')) || []
                 }
             },
             computed: {
@@ -356,6 +363,9 @@
                     this.currentView = viewName;
                     this.fetchData(viewName);
                 },
+                isBatchCompleted(batchNumber) {
+                    return this.completedBatches.includes(batchNumber);
+                },
                 async fetchData(actionType) {
                     this.loading = true;
                     this.rawData = [];
@@ -380,7 +390,6 @@
                     this.pickingData = [];
                     this.pickedItems = []; 
                     
-                    // Reset filters
                     this.activeTab = 'BELUM';
                     this.activeCategory = 'Semua';
                     this.searchQuery = '';
@@ -391,18 +400,40 @@
                         const response = await fetch(`${this.apiUrl}?action=detail`);
                         const result = await response.json();
                         if (result.status === 'success') {
-                            this.pickingData = result.data.filter(item => 
+                            const rawItems = result.data.filter(item => 
                                 item['Batch'] == batch['Batch'] && 
                                 item['Shift'] == batch['Shift'] && 
                                 item['Nama Barang'] !== '[DAFTAR TOKO]'
-                            ).map(item => ({
-                                ...item,
-                                editMode: false,
-                                qtyT1: parseInt(item['Toko 1 (merah)']) || 0,
-                                qtyT2: parseInt(item['Toko 2 (hijau)']) || 0,
-                                qtyT3: parseInt(item['Toko 3 (kuning)']) || 0,
-                                qtyT4: parseInt(item['Toko 4 (biru)']) || 0
-                            }));
+                            );
+                            
+                            // Cek apakah ada draft yang tersimpan sebelumnya di memori HP
+                            const savedDraft = localStorage.getItem(`draft_batch_${batch['Batch']}_${batch['Shift']}`);
+                            
+                            if (savedDraft) {
+                                const parsedDraft = JSON.parse(savedDraft);
+                                this.pickedItems = parsedDraft.pickedItems || [];
+                                
+                                this.pickingData = rawItems.map(item => {
+                                    const foundSaved = parsedDraft.itemsState.find(s => s.name === item['Nama Barang']);
+                                    return {
+                                        ...item,
+                                        editMode: false,
+                                        qtyT1: foundSaved ? foundSaved.qtyT1 : (parseInt(item['Toko 1 (merah)']) || 0),
+                                        qtyT2: foundSaved ? foundSaved.qtyT2 : (parseInt(item['Toko 2 (hijau)']) || 0),
+                                        qtyT3: foundSaved ? foundSaved.qtyT3 : (parseInt(item['Toko 3 (kuning)']) || 0),
+                                        qtyT4: foundSaved ? foundSaved.qtyT4 : (parseInt(item['Toko 4 (biru)']) || 0)
+                                    };
+                                });
+                            } else {
+                                this.pickingData = rawItems.map(item => ({
+                                    ...item,
+                                    editMode: false,
+                                    qtyT1: parseInt(item['Toko 1 (merah)']) || 0,
+                                    qtyT2: parseInt(item['Toko 2 (hijau)']) || 0,
+                                    qtyT3: parseInt(item['Toko 3 (kuning)']) || 0,
+                                    qtyT4: parseInt(item['Toko 4 (biru)']) || 0
+                                }));
+                            }
                         } else {
                             alert(result.message);
                         }
@@ -412,6 +443,21 @@
                         this.loading = false;
                     }
                 },
+                // Fungsi Simpan Otomatis Draft ke Memori HP
+                saveDraft() {
+                    if (!this.selectedBatchData) return;
+                    const draftData = {
+                        pickedItems: this.pickedItems,
+                        itemsState: this.pickingData.map(i => ({
+                            name: i['Nama Barang'],
+                            qtyT1: i.qtyT1,
+                            qtyT2: i.qtyT2,
+                            qtyT3: i.qtyT3,
+                            qtyT4: i.qtyT4
+                        }))
+                    };
+                    localStorage.setItem(`draft_batch_${this.selectedBatchData['Batch']}_${this.selectedBatchData['Shift']}`, JSON.stringify(draftData));
+                },
                 togglePick(itemName) {
                     const index = this.pickedItems.indexOf(itemName);
                     if (index > -1) {
@@ -419,6 +465,7 @@
                     } else {
                         this.pickedItems.push(itemName);
                     }
+                    this.saveDraft();
                 },
                 isPicked(itemName) {
                     return this.pickedItems.includes(itemName);
@@ -465,6 +512,13 @@
                     } else {
                         alert("✅ Batch diselesaikan sempurna tanpa selisih!");
                     }
+                    
+                    // Simpan penanda batch selesai & Hapus draft karena sudah tuntas
+                    if (!this.completedBatches.includes(this.selectedBatchData['Batch'])) {
+                        this.completedBatches.push(this.selectedBatchData['Batch']);
+                        localStorage.setItem('completedBatches', JSON.stringify(this.completedBatches));
+                    }
+                    localStorage.removeItem(`draft_batch_${this.selectedBatchData['Batch']}_${this.selectedBatchData['Shift']}`);
                     
                     window.scrollTo(0, 0);
                     this.currentView = 'batch';
