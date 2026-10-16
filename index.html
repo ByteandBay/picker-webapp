@@ -195,7 +195,7 @@
                                         <span class="text-sm font-black" :class="{'text-red-400 line-through text-xs': item.qtyT1 !== item['Toko 1 (merah)']}">{{ item['Toko 1 (merah)'] }}</span>
                                         <span v-if="item.qtyT1 !== item['Toko 1 (merah)']" class="text-sm font-black text-red-700 block leading-none">{{ item.qtyT1 }}</span>
                                     </div>
-                                    <div v-else class="flex items-center gap-1"><button @click.stop="if(item.qtyT1 > 0) item.qtyT1--" class="bg-red-200 rounded h-5 w-5 font-bold">-</button><span class="text-xs font-black w-3 text-center">{{ item.qtyT1 }}</span><button @click.stop="item.qtyT1++" class="bg-red-200 rounded h-5 w-5 font-bold">+</button></div>
+                                    <div v-else class="flex items-center gap-1"><button @click.stop="item.qtyT1 > 0 ? item.qtyT1-- : null" class="bg-red-200 rounded h-5 w-5 font-bold">-</button><span class="text-xs font-black w-3 text-center">{{ item.qtyT1 }}</span><button @click.stop="item.qtyT1++" class="bg-red-200 rounded h-5 w-5 font-bold">+</button></div>
                                 </div>
                                 
                                 <div v-if="item['Toko 2 (hijau)'] > 0" class="bg-emerald-50 text-emerald-800 border border-emerald-200 rounded p-1.5 min-w-[42px] flex flex-col items-center">
@@ -204,7 +204,7 @@
                                         <span class="text-sm font-black" :class="{'text-emerald-400 line-through text-xs': item.qtyT2 !== item['Toko 2 (hijau)']}">{{ item['Toko 2 (hijau)'] }}</span>
                                         <span v-if="item.qtyT2 !== item['Toko 2 (hijau)']" class="text-sm font-black text-emerald-700 block leading-none">{{ item.qtyT2 }}</span>
                                     </div>
-                                    <div v-else class="flex items-center gap-1"><button @click.stop="if(item.qtyT2 > 0) item.qtyT2--" class="bg-emerald-200 rounded h-5 w-5 font-bold">-</button><span class="text-xs font-black w-3 text-center">{{ item.qtyT2 }}</span><button @click.stop="item.qtyT2++" class="bg-emerald-200 rounded h-5 w-5 font-bold">+</button></div>
+                                    <div v-else class="flex items-center gap-1"><button @click.stop="item.qtyT2 > 0 ? item.qtyT2-- : null" class="bg-emerald-200 rounded h-5 w-5 font-bold">-</button><span class="text-xs font-black w-3 text-center">{{ item.qtyT2 }}</span><button @click.stop="item.qtyT2++" class="bg-emerald-200 rounded h-5 w-5 font-bold">+</button></div>
                                 </div>
 
                                 <div v-if="item['Toko 3 (kuning)'] > 0" class="bg-yellow-50 text-yellow-800 border border-yellow-300 rounded p-1.5 min-w-[42px] flex flex-col items-center">
@@ -213,7 +213,7 @@
                                         <span class="text-sm font-black" :class="{'text-yellow-500 line-through text-xs': item.qtyT3 !== item['Toko 3 (kuning)']}">{{ item['Toko 3 (kuning)'] }}</span>
                                         <span v-if="item.qtyT3 !== item['Toko 3 (kuning)']" class="text-sm font-black text-yellow-700 block leading-none">{{ item.qtyT3 }}</span>
                                     </div>
-                                    <div v-else class="flex items-center gap-1"><button @click.stop="if(item.qtyT3 > 0) item.qtyT3--" class="bg-yellow-200 rounded h-5 w-5 font-bold">-</button><span class="text-xs font-black w-3 text-center">{{ item.qtyT3 }}</span><button @click.stop="item.qtyT3++" class="bg-yellow-200 rounded h-5 w-5 font-bold">+</button></div>
+                                    <div v-else class="flex items-center gap-1"><button @click.stop="item.qtyT3 > 0 ? item.qtyT3-- : null" class="bg-yellow-200 rounded h-5 w-5 font-bold">-</button><span class="text-xs font-black w-3 text-center">{{ item.qtyT3 }}</span><button @click.stop="item.qtyT3++" class="bg-yellow-200 rounded h-5 w-5 font-bold">+</button></div>
                                 </div>
 
                                 <div v-if="item['Toko 4 (biru)'] > 0" class="bg-blue-50 text-blue-800 border border-blue-200 rounded p-1.5 min-w-[42px] flex flex-col items-center">
@@ -222,7 +222,7 @@
                                         <span class="text-sm font-black" :class="{'text-blue-400 line-through text-xs': item.qtyT4 !== item['Toko 4 (biru)']}">{{ item['Toko 4 (biru)'] }}</span>
                                         <span v-if="item.qtyT4 !== item['Toko 4 (biru)']" class="text-sm font-black text-blue-700 block leading-none">{{ item.qtyT4 }}</span>
                                     </div>
-                                    <div v-else class="flex items-center gap-1"><button @click.stop="if(item.qtyT4 > 0) item.qtyT4--" class="bg-blue-200 rounded h-5 w-5 font-bold">-</button><span class="text-xs font-black w-3 text-center">{{ item.qtyT4 }}</span><button @click.stop="item.qtyT4++" class="bg-blue-200 rounded h-5 w-5 font-bold">+</button></div>
+                                    <div v-else class="flex items-center gap-1"><button @click.stop="item.qtyT4 > 0 ? item.qtyT4-- : null" class="bg-blue-200 rounded h-5 w-5 font-bold">-</button><span class="text-xs font-black w-3 text-center">{{ item.qtyT4 }}</span><button @click.stop="item.qtyT4++" class="bg-blue-200 rounded h-5 w-5 font-bold">+</button></div>
                                 </div>
                             </div>
                         </div>
