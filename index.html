@@ -7,234 +7,250 @@
     <!-- Vue 3 & Tailwind CSS -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Permanent Marker, Press Start 2P, Inter -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Press+Start+2P&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <!-- Lottie Player untuk Animasi Api -->
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #ffffff; overflow-x: hidden; }
         .font-marker { font-family: 'Permanent Marker', cursive; }
         .font-pixel { font-family: 'Press Start 2P', cursive; }
-        /* Transisi Bottom Sheet */
         .bottom-sheet { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .sheet-hidden { transform: translateY(100%); }
         .sheet-visible { transform: translateY(0); }
-        /* Efek klik kartu & dimmed item */
         .clickable-card { transition: all 0.2s ease; cursor: pointer; }
         .clickable-card:active { transform: scale(0.98); }
         .item-card { transition: all 0.3s ease; }
-        .dimmed { opacity: 0.4; filter: grayscale(80%); }
+        .dimmed { opacity: 0.4; filter: grayscale(80%); pointer-events: none; }
+        
+        /* Animasi Running Light VAPEBOSS */
+        .neon-marquee-container {
+            width: 100%;
+            overflow: hidden;
+            background-color: #000;
+            padding: 15px 0;
+            border-radius: 12px;
+            border: 3px solid #333;
+            box-shadow: inset 0 0 10px rgba(0,255,0,0.2);
+            position: relative;
+        }
+        .neon-marquee {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 4s linear infinite;
+            font-size: 28px;
+            color: #0f0;
+            text-shadow: 0 0 5px #0f0, 0 0 10px #0f0, 0 0 20px #0f0, 0 0 40px #0f0;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
     </style>
 </head>
 <body class="text-gray-900 bg-white">
-    <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden shadow-2xl bg-gray-50">
+    <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden shadow-2xl bg-gray-50 flex flex-col">
         
-        <!-- ========================================== -->
-        <!-- 1. HALAMAN SPLASH SCREEN (MENU UTAMA)      -->
-        <!-- ========================================== -->
-        <div v-if="currentView === 'splash'" class="flex flex-col items-center justify-center min-h-screen p-6 text-center relative z-10 bg-white">
-            <h1 class="font-marker text-4xl leading-tight mb-2 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">
+        <!-- SPLASH SCREEN -->
+        <div v-if="currentView === 'splash'" class="flex flex-col items-center justify-center flex-1 p-6 text-center relative z-10 bg-white">
+            <h1 class="font-marker text-4xl leading-tight mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">
                 WELLCOME<br><span class="text-black">TO</span><br>PORTAL<br>PICKER
             </h1>
             
-            <div class="my-4">
-                <lottie-player src="https://assets3.lottiefiles.com/packages/lf20_q7uarxsb.json" background="transparent" speed="1.5" style="width: 250px; height: 250px;" loop autoplay></lottie-player>
+            <!-- VAPEBOSS Running Light Animation -->
+            <div class="w-full max-w-[280px] mb-8">
+                <div class="neon-marquee-container">
+                    <span class="neon-marquee font-pixel">VAPEBOSS</span>
+                </div>
             </div>
 
-            <h2 class="font-marker text-3xl text-black drop-shadow-md mb-10 leading-snug">
+            <h2 class="font-marker text-3xl text-black drop-shadow-md mb-12 leading-snug">
                 SEMANGAT KERJA !!!<br>AND<br>LETS THRIVING
             </h2>
 
-            <button @click="menuOpen = true" class="font-pixel text-xl text-purple-900 bg-gradient-to-r from-yellow-400 via-yellow-300 to-pink-400 px-8 py-4 rounded-full border-4 border-pink-500 shadow-[0_8px_0_rgb(236,72,153)] hover:shadow-[0_4px_0_rgb(236,72,153)] hover:translate-y-1 transition-all active:shadow-none active:translate-y-2">
+            <button @click="menuOpen = true" class="font-pixel text-xl text-purple-900 bg-gradient-to-r from-yellow-400 via-yellow-300 to-pink-400 px-8 py-4 rounded-full border-4 border-pink-500 shadow-[0_8px_0_rgb(236,72,153)] hover:translate-y-1 transition-all active:shadow-none active:translate-y-2 mt-4">
                 MENU
             </button>
         </div>
 
-        <!-- ========================================== -->
-        <!-- BOTTOM SHEET POPUP (NAVIGASI MENU)         -->
-        <!-- ========================================== -->
-        <div class="absolute inset-0 bg-black/60 z-40 transition-opacity duration-300" 
-             :class="menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'" 
-             @click="menuOpen = false"></div>
-             
-        <div class="bottom-sheet absolute bottom-0 left-0 right-0 bg-[#d4e157] rounded-t-3xl p-8 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.3)]"
-             :class="menuOpen ? 'sheet-visible' : 'sheet-hidden'">
+        <!-- BOTTOM SHEET -->
+        <div class="absolute inset-0 bg-black/60 z-40 transition-opacity duration-300" :class="menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'" @click="menuOpen = false"></div>
+        <div class="bottom-sheet absolute bottom-0 left-0 right-0 bg-[#d4e157] rounded-t-3xl p-8 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.3)]" :class="menuOpen ? 'sheet-visible' : 'sheet-hidden'">
             <div class="w-16 h-1.5 bg-black/20 rounded-full mx-auto mb-8"></div>
-            
             <div class="space-y-6 flex flex-col items-center">
-                <button @click="openView('rute')" class="w-full max-w-[250px] border-y-4 border-red-600 py-3 text-red-600 font-bold text-3xl font-serif tracking-wide hover:bg-black/5 transition-colors">
-                    List Rute
-                </button>
-                <button @click="openView('batch')" class="w-full max-w-[250px] border-y-4 border-red-600 py-3 text-red-600 font-bold text-3xl font-serif tracking-wide hover:bg-black/5 transition-colors">
-                    Batch Picking
-                </button>
+                <button @click="openView('rute')" class="w-full max-w-[250px] border-y-4 border-red-600 py-3 text-red-600 font-bold text-3xl font-serif tracking-wide hover:bg-black/5 transition-colors">List Rute</button>
+                <button @click="openView('batch')" class="w-full max-w-[250px] border-y-4 border-red-600 py-3 text-red-600 font-bold text-3xl font-serif tracking-wide hover:bg-black/5 transition-colors">Batch Picking</button>
             </div>
             <div class="pb-10"></div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- 2. HALAMAN LIST RUTE & BATCH SUMMARY       -->
-        <!-- ========================================== -->
-        <div v-if="currentView === 'rute' || currentView === 'batch'" class="min-h-screen pb-20 relative z-20">
-            <!-- Header Navigasi -->
+        <!-- HALAMAN RUTE / BATCH SUMMARY -->
+        <div v-if="currentView === 'rute' || currentView === 'batch'" class="flex-1 pb-20 relative z-20">
             <div class="bg-slate-900 text-white p-4 sticky top-0 z-30 shadow-md flex items-center justify-between">
-                <button @click="currentView = 'splash'" class="bg-slate-800 p-2 rounded-lg text-sm font-bold flex items-center gap-1 hover:bg-slate-700">
-                    ⬅ Kembali
-                </button>
-                <h2 class="font-bold text-lg">
-                    {{ currentView === 'rute' ? 'Daftar Rute Shift' : 'Pilih Batch' }}
-                </h2>
-                <button @click="fetchData(currentView)" class="bg-emerald-600 p-2 rounded-lg text-sm font-bold hover:bg-emerald-500">
-                    🔄
-                </button>
+                <button @click="currentView = 'splash'" class="bg-slate-800 p-2 rounded-lg text-sm font-bold flex items-center hover:bg-slate-700">⬅ Kembali</button>
+                <h2 class="font-bold text-lg">{{ currentView === 'rute' ? 'Daftar Rute' : 'Pilih Batch' }}</h2>
+                <button @click="fetchData(currentView)" class="bg-emerald-600 p-2 rounded-lg text-sm font-bold hover:bg-emerald-500">🔄</button>
             </div>
 
-            <!-- Pesan Loading -->
             <div v-if="loading" class="flex flex-col items-center justify-center pt-20">
                 <div class="animate-spin w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full mb-3"></div>
-                <p class="text-gray-500 font-medium">Menarik data dari server...</p>
+                <p class="text-gray-500 font-medium">Menarik data server...</p>
             </div>
 
             <div v-if="!loading" class="p-4 space-y-4">
                 
-                <!-- TAMPILAN: LIST RUTE -->
+                <!-- LIST RUTE -->
                 <div v-if="currentView === 'rute'">
                     <div v-for="(cabangList, shiftName) in groupedRoutes" :key="shiftName" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-5">
-                        <div class="bg-[#d4e157] px-4 py-3 border-b border-gray-200">
-                            <h3 class="font-bold text-gray-900 text-sm uppercase tracking-wide">{{ shiftName }}</h3>
-                        </div>
+                        <div class="bg-[#d4e157] px-4 py-3 border-b border-gray-200"><h3 class="font-bold text-gray-900 text-sm uppercase">{{ shiftName }}</h3></div>
                         <ul class="divide-y divide-gray-100">
-                            <li v-for="cabang in cabangList" class="px-4 py-3 text-sm text-gray-700 font-medium flex items-center gap-3">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500 block"></span>
-                                {{ cabang }}
-                            </li>
+                            <li v-for="cabang in cabangList" class="px-4 py-3 text-sm text-gray-700 font-medium flex items-center gap-3"><span class="w-2 h-2 rounded-full bg-emerald-500 block"></span>{{ cabang }}</li>
                         </ul>
                     </div>
                 </div>
 
-                <!-- TAMPILAN: BATCH SUMMARY (Kartu bisa diklik) -->
+                <!-- BATCH SUMMARY -->
                 <div v-if="currentView === 'batch'">
-                    <div v-for="(batch, index) in rawData" :key="index" @click="goToPicking(batch)" class="clickable-card bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden mb-5 hover:shadow-lg">
-                        <!-- Header Kartu -->
+                    <div v-for="(batch, index) in rawData" :key="index" @click="goToPicking(batch)" class="clickable-card bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden mb-5">
                         <div class="bg-slate-900 text-white px-5 py-4 flex justify-between items-center">
                             <h3 class="font-black text-xl">BATCH {{ batch['Batch'] }}</h3>
                             <span class="text-[10px] font-semibold bg-slate-700 px-2 py-1 rounded-full text-right leading-tight max-w-[140px]">{{ batch['Shift'] }}</span>
                         </div>
-                        
-                        <!-- Grid Toko -->
                         <div class="p-4 grid grid-cols-2 gap-3">
                             <div v-if="batch['Toko 1 (merah)'] !== '-'" class="bg-red-50 border border-red-200 rounded-lg p-2 text-center">
-                                <p class="text-[9px] font-bold text-red-600 mb-1">TOKO 1</p>
-                                <p class="text-xs font-semibold text-red-900 leading-tight">{{ batch['Toko 1 (merah)'] }}</p>
+                                <p class="text-[9px] font-bold text-red-600 mb-1">TOKO 1</p><p class="text-xs font-semibold text-red-900 leading-tight">{{ batch['Toko 1 (merah)'] }}</p>
                             </div>
                             <div v-if="batch['Toko 2 (hijau)'] !== '-'" class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-center">
-                                <p class="text-[9px] font-bold text-emerald-600 mb-1">TOKO 2</p>
-                                <p class="text-xs font-semibold text-emerald-900 leading-tight">{{ batch['Toko 2 (hijau)'] }}</p>
+                                <p class="text-[9px] font-bold text-emerald-600 mb-1">TOKO 2</p><p class="text-xs font-semibold text-emerald-900 leading-tight">{{ batch['Toko 2 (hijau)'] }}</p>
                             </div>
                             <div v-if="batch['Toko 3 (kuning)'] !== '-'" class="bg-yellow-50 border border-yellow-300 rounded-lg p-2 text-center">
-                                <p class="text-[9px] font-bold text-yellow-700 mb-1">TOKO 3</p>
-                                <p class="text-xs font-semibold text-yellow-900 leading-tight">{{ batch['Toko 3 (kuning)'] }}</p>
+                                <p class="text-[9px] font-bold text-yellow-700 mb-1">TOKO 3</p><p class="text-xs font-semibold text-yellow-900 leading-tight">{{ batch['Toko 3 (kuning)'] }}</p>
                             </div>
                             <div v-if="batch['Toko 4 (biru)'] !== '-'" class="bg-blue-50 border border-blue-200 rounded-lg p-2 text-center">
-                                <p class="text-[9px] font-bold text-blue-600 mb-1">TOKO 4</p>
-                                <p class="text-xs font-semibold text-blue-900 leading-tight">{{ batch['Toko 4 (biru)'] }}</p>
+                                <p class="text-[9px] font-bold text-blue-600 mb-1">TOKO 4</p><p class="text-xs font-semibold text-blue-900 leading-tight">{{ batch['Toko 4 (biru)'] }}</p>
                             </div>
                         </div>
-
-                        <!-- Footer Bantuan Klik -->
-                        <div class="bg-emerald-50 p-3 text-center border-t border-emerald-100">
+                        <div class="bg-gray-50 py-3 px-2 border-t border-gray-100 grid grid-cols-4 divide-x divide-gray-200 text-center">
+                            <div><p class="text-[8px] text-gray-500 font-bold uppercase">Identik</p><p class="text-xs font-black text-gray-800">{{ batch['Identik (4 Item)'] }}</p></div>
+                            <div><p class="text-[8px] text-gray-500 font-bold uppercase">Multi</p><p class="text-xs font-black text-gray-800">{{ batch['Multi (3 Item)'] }}</p></div>
+                            <div><p class="text-[8px] text-gray-500 font-bold uppercase">Semi</p><p class="text-xs font-black text-gray-800">{{ batch['Semi (2 Item)'] }}</p></div>
+                            <div><p class="text-[8px] text-gray-500 font-bold uppercase">T.Identik</p><p class="text-xs font-black text-gray-800">{{ batch['Tidak Identik (1 Item)'] }}</p></div>
+                        </div>
+                        <div class="bg-emerald-50 p-3 text-center border-t border-emerald-200">
                             <span class="text-emerald-700 font-bold text-sm flex justify-center items-center gap-1">
                                 📦 Mulai Ambil Barang ({{ batch['Total SKU'] }} SKU) <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                             </span>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- 3. HALAMAN PICKING BARANG (DETAIL CEKLIS)  -->
-        <!-- ========================================== -->
-        <div v-if="currentView === 'picking'" class="min-h-screen pb-20 relative z-20">
-            <!-- Header Navigasi -->
-            <div class="bg-slate-900 text-white p-4 sticky top-0 z-30 shadow-md">
-                <div class="flex items-center justify-between mb-3">
-                    <button @click="currentView = 'batch'" class="bg-slate-800 p-2 rounded-lg text-sm font-bold flex items-center gap-1 hover:bg-slate-700">
-                        ⬅ Batal
-                    </button>
-                    <div class="text-right">
-                        <h2 class="font-bold text-lg leading-tight">Batch {{ selectedBatchData['Batch'] }}</h2>
-                        <p class="text-[10px] text-slate-300 truncate max-w-[150px]">{{ selectedBatchData['Shift'] }}</p>
+        <!-- HALAMAN PICKING BARANG -->
+        <div v-if="currentView === 'picking'" class="flex-1 pb-20 relative z-20">
+            <div class="bg-slate-900 text-white sticky top-0 z-30 shadow-md flex flex-col">
+                <div class="p-4 pb-3">
+                    <div class="flex items-center justify-between mb-3">
+                        <button @click="currentView = 'batch'" class="bg-slate-800 p-2 rounded-lg text-sm font-bold flex items-center hover:bg-slate-700">⬅ Batal</button>
+                        <div class="text-right">
+                            <h2 class="font-bold text-lg leading-tight">Batch {{ selectedBatchData['Batch'] }}</h2>
+                            <p class="text-[10px] text-slate-300 truncate max-w-[150px]">{{ selectedBatchData['Shift'] }}</p>
+                        </div>
+                    </div>
+                    <div v-if="!loading && pickingData.length > 0">
+                        <div class="flex justify-between text-xs text-slate-300 mb-1">
+                            <span>Progres: {{ pickedCount }} / {{ pickingData.length }} Item</span><span>{{ progressPercent }}%</span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-2"><div class="bg-[#d4e157] h-2 rounded-full transition-all duration-500" :style="`width: ${progressPercent}%`"></div></div>
                     </div>
                 </div>
 
-                <!-- Progress Bar -->
-                <div v-if="!loading && pickingData.length > 0">
-                    <div class="flex justify-between text-xs text-slate-300 mb-1">
-                        <span>Progres Pengambilan:</span>
-                        <span>{{ pickedCount }} / {{ pickingData.length }} Item ({{ progressPercent }}%)</span>
-                    </div>
-                    <div class="w-full bg-slate-700 rounded-full h-2">
-                        <div class="bg-[#d4e157] h-2 rounded-full transition-all duration-500" :style="`width: ${progressPercent}%`"></div>
-                    </div>
+                <!-- Freeze Panel Toko -->
+                <div v-if="selectedBatchData && !loading" class="bg-white border-b border-gray-200 px-3 py-2 grid grid-cols-2 gap-1.5 shadow-sm">
+                    <div v-if="selectedBatchData['Toko 1 (merah)'] !== '-'" class="flex items-center gap-1 bg-red-50 text-red-900 text-[9px] font-bold p-1.5 rounded border border-red-200"><span class="bg-red-500 text-white px-1.5 py-0.5 rounded">T1</span><span class="truncate">{{ selectedBatchData['Toko 1 (merah)'] }}</span></div>
+                    <div v-if="selectedBatchData['Toko 2 (hijau)'] !== '-'" class="flex items-center gap-1 bg-emerald-50 text-emerald-900 text-[9px] font-bold p-1.5 rounded border border-emerald-200"><span class="bg-emerald-500 text-white px-1.5 py-0.5 rounded">T2</span><span class="truncate">{{ selectedBatchData['Toko 2 (hijau)'] }}</span></div>
+                    <div v-if="selectedBatchData['Toko 3 (kuning)'] !== '-'" class="flex items-center gap-1 bg-yellow-50 text-yellow-900 text-[9px] font-bold p-1.5 rounded border border-yellow-300"><span class="bg-yellow-400 text-white px-1.5 py-0.5 rounded">T3</span><span class="truncate">{{ selectedBatchData['Toko 3 (kuning)'] }}</span></div>
+                    <div v-if="selectedBatchData['Toko 4 (biru)'] !== '-'" class="flex items-center gap-1 bg-blue-50 text-blue-900 text-[9px] font-bold p-1.5 rounded border border-blue-200"><span class="bg-blue-500 text-white px-1.5 py-0.5 rounded">T4</span><span class="truncate">{{ selectedBatchData['Toko 4 (biru)'] }}</span></div>
                 </div>
             </div>
 
-            <!-- Pesan Loading -->
             <div v-if="loading" class="flex flex-col items-center justify-center pt-20">
                 <div class="animate-spin w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full mb-3"></div>
-                <p class="text-gray-500 font-medium">Membuka daftar barang...</p>
+                <p class="text-gray-500 font-medium">Memuat data...</p>
             </div>
 
             <div v-if="!loading" class="p-4 space-y-3">
-                <!-- Daftar Barang (Item Cards) -->
-                <div v-for="(item, index) in pickingData" :key="index" 
-                     class="item-card bg-white rounded-xl shadow-sm border border-gray-100 flex overflow-hidden"
-                     :class="{ 'dimmed': isPicked(item['Nama Barang']) }">
-                    
-                    <!-- Kiri: Info Barang -->
-                    <div class="p-3 flex-1">
-                        <div class="flex justify-between items-start mb-1">
-                            <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">{{ item['Kategori'] }}</span>
-                            <span class="bg-slate-800 text-white text-[11px] font-bold px-2 py-0.5 rounded">TOTAL: {{ item['Total Item'] }}</span>
+                <div v-for="(item, index) in pickingData" :key="index" class="item-card bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col overflow-hidden" :class="{ 'dimmed': isPicked(item['Nama Barang']) }">
+                    <div class="flex">
+                        <div class="p-3 flex-1 border-r border-gray-100">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="text-[10px] uppercase font-bold text-gray-400">{{ item['Kategori'] }}</span>
+                                <span class="bg-slate-800 text-white text-[11px] font-bold px-2 py-0.5 rounded">TOTAL: {{ item.qtyT1 + item.qtyT2 + item.qtyT3 + item.qtyT4 }}</span>
+                            </div>
+                            <h2 class="text-sm font-bold text-gray-800 leading-snug mb-3">{{ item['Nama Barang'] }}</h2>
+                            
+                            <!-- Grid Kuantitas & Edit (-) (+) -->
+                            <div class="flex flex-wrap gap-2">
+                                <div v-if="item['Toko 1 (merah)'] > 0" class="bg-red-50 text-red-800 border border-red-200 rounded p-1.5 min-w-[42px] flex flex-col items-center">
+                                    <span class="text-[9px] font-bold mb-0.5">T-1</span>
+                                    <div v-if="!item.editMode" class="text-center">
+                                        <span class="text-sm font-black" :class="{'text-red-400 line-through text-xs': item.qtyT1 !== item['Toko 1 (merah)']}">{{ item['Toko 1 (merah)'] }}</span>
+                                        <span v-if="item.qtyT1 !== item['Toko 1 (merah)']" class="text-sm font-black text-red-700 block leading-none">{{ item.qtyT1 }}</span>
+                                    </div>
+                                    <div v-else class="flex items-center gap-1"><button @click.stop="if(item.qtyT1 > 0) item.qtyT1--" class="bg-red-200 rounded h-5 w-5 font-bold">-</button><span class="text-xs font-black w-3 text-center">{{ item.qtyT1 }}</span><button @click.stop="item.qtyT1++" class="bg-red-200 rounded h-5 w-5 font-bold">+</button></div>
+                                </div>
+                                
+                                <div v-if="item['Toko 2 (hijau)'] > 0" class="bg-emerald-50 text-emerald-800 border border-emerald-200 rounded p-1.5 min-w-[42px] flex flex-col items-center">
+                                    <span class="text-[9px] font-bold mb-0.5">T-2</span>
+                                    <div v-if="!item.editMode" class="text-center">
+                                        <span class="text-sm font-black" :class="{'text-emerald-400 line-through text-xs': item.qtyT2 !== item['Toko 2 (hijau)']}">{{ item['Toko 2 (hijau)'] }}</span>
+                                        <span v-if="item.qtyT2 !== item['Toko 2 (hijau)']" class="text-sm font-black text-emerald-700 block leading-none">{{ item.qtyT2 }}</span>
+                                    </div>
+                                    <div v-else class="flex items-center gap-1"><button @click.stop="if(item.qtyT2 > 0) item.qtyT2--" class="bg-emerald-200 rounded h-5 w-5 font-bold">-</button><span class="text-xs font-black w-3 text-center">{{ item.qtyT2 }}</span><button @click.stop="item.qtyT2++" class="bg-emerald-200 rounded h-5 w-5 font-bold">+</button></div>
+                                </div>
+
+                                <div v-if="item['Toko 3 (kuning)'] > 0" class="bg-yellow-50 text-yellow-800 border border-yellow-300 rounded p-1.5 min-w-[42px] flex flex-col items-center">
+                                    <span class="text-[9px] font-bold mb-0.5">T-3</span>
+                                    <div v-if="!item.editMode" class="text-center">
+                                        <span class="text-sm font-black" :class="{'text-yellow-500 line-through text-xs': item.qtyT3 !== item['Toko 3 (kuning)']}">{{ item['Toko 3 (kuning)'] }}</span>
+                                        <span v-if="item.qtyT3 !== item['Toko 3 (kuning)']" class="text-sm font-black text-yellow-700 block leading-none">{{ item.qtyT3 }}</span>
+                                    </div>
+                                    <div v-else class="flex items-center gap-1"><button @click.stop="if(item.qtyT3 > 0) item.qtyT3--" class="bg-yellow-200 rounded h-5 w-5 font-bold">-</button><span class="text-xs font-black w-3 text-center">{{ item.qtyT3 }}</span><button @click.stop="item.qtyT3++" class="bg-yellow-200 rounded h-5 w-5 font-bold">+</button></div>
+                                </div>
+
+                                <div v-if="item['Toko 4 (biru)'] > 0" class="bg-blue-50 text-blue-800 border border-blue-200 rounded p-1.5 min-w-[42px] flex flex-col items-center">
+                                    <span class="text-[9px] font-bold mb-0.5">T-4</span>
+                                    <div v-if="!item.editMode" class="text-center">
+                                        <span class="text-sm font-black" :class="{'text-blue-400 line-through text-xs': item.qtyT4 !== item['Toko 4 (biru)']}">{{ item['Toko 4 (biru)'] }}</span>
+                                        <span v-if="item.qtyT4 !== item['Toko 4 (biru)']" class="text-sm font-black text-blue-700 block leading-none">{{ item.qtyT4 }}</span>
+                                    </div>
+                                    <div v-else class="flex items-center gap-1"><button @click.stop="if(item.qtyT4 > 0) item.qtyT4--" class="bg-blue-200 rounded h-5 w-5 font-bold">-</button><span class="text-xs font-black w-3 text-center">{{ item.qtyT4 }}</span><button @click.stop="item.qtyT4++" class="bg-blue-200 rounded h-5 w-5 font-bold">+</button></div>
+                                </div>
+                            </div>
                         </div>
-                        <h2 class="text-sm font-bold text-gray-800 leading-snug mb-3">
-                            {{ item['Nama Barang'] }}
-                        </h2>
-                        
-                        <!-- Grid Kuantitas Toko -->
-                        <div class="flex flex-wrap gap-2">
-                            <div v-if="item['Toko 1 (merah)'] > 0" class="bg-red-50 text-red-700 border border-red-200 rounded px-2 py-1 flex flex-col items-center justify-center min-w-[36px]">
-                                <span class="text-[9px] font-bold">T-1</span>
-                                <span class="text-sm font-black">{{ item['Toko 1 (merah)'] }}</span>
-                            </div>
-                            <div v-if="item['Toko 2 (hijau)'] > 0" class="bg-emerald-50 text-emerald-700 border border-emerald-200 rounded px-2 py-1 flex flex-col items-center justify-center min-w-[36px]">
-                                <span class="text-[9px] font-bold">T-2</span>
-                                <span class="text-sm font-black">{{ item['Toko 2 (hijau)'] }}</span>
-                            </div>
-                            <div v-if="item['Toko 3 (kuning)'] > 0" class="bg-yellow-50 text-yellow-700 border border-yellow-200 rounded px-2 py-1 flex flex-col items-center justify-center min-w-[36px]">
-                                <span class="text-[9px] font-bold">T-3</span>
-                                <span class="text-sm font-black">{{ item['Toko 3 (kuning)'] }}</span>
-                            </div>
-                            <div v-if="item['Toko 4 (biru)'] > 0" class="bg-blue-50 text-blue-700 border border-blue-200 rounded px-2 py-1 flex flex-col items-center justify-center min-w-[36px]">
-                                <span class="text-[9px] font-bold">T-4</span>
-                                <span class="text-sm font-black">{{ item['Toko 4 (biru)'] }}</span>
-                            </div>
-                        </div>
+
+                        <!-- Tombol Ambil -->
+                        <button @click="togglePick(item['Nama Barang'])" class="w-20 flex flex-col items-center justify-center transition-colors" :class="isPicked(item['Nama Barang']) ? 'bg-gray-100 text-gray-400' : 'bg-[#d4e157] hover:bg-[#cddc39] text-slate-800'">
+                            <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <span class="text-[10px] font-bold tracking-wide" v-text="isPicked(item['Nama Barang']) ? 'SELESAI' : 'AMBIL'"></span>
+                        </button>
                     </div>
 
-                    <!-- Kanan: Tombol Action (Ceklis) -->
-                    <button @click="togglePick(item['Nama Barang'])" 
-                            class="w-20 flex flex-col items-center justify-center border-l border-gray-100 transition-colors"
-                            :class="isPicked(item['Nama Barang']) ? 'bg-gray-100 text-gray-400' : 'bg-[#d4e157] hover:bg-[#cddc39] text-slate-800'">
-                        <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="text-[10px] font-bold tracking-wide" v-text="isPicked(item['Nama Barang']) ? 'SELESAI' : 'AMBIL'"></span>
-                    </button>
+                    <!-- Pemicu Laporan Kurang -->
+                    <div class="bg-gray-50 p-2 flex justify-between items-center px-3 border-t border-gray-100">
+                        <button v-if="!item.editMode && !isPicked(item['Nama Barang'])" @click.stop="item.editMode = true" class="text-[10px] text-amber-600 font-bold flex items-center gap-1 bg-amber-50 px-2 py-1.5 rounded hover:bg-amber-100 border border-amber-200">
+                            ⚠️ Stok Fisik Kurang?
+                        </button>
+                        <button v-if="item.editMode" @click.stop="item.editMode = false" class="text-[10px] text-white font-bold bg-amber-500 px-4 py-1.5 rounded shadow-sm w-full justify-center">
+                            ✅ Simpan Penyesuaian
+                        </button>
+                    </div>
                 </div>
                 
-                <div v-if="pickingData.length === 0" class="text-center py-10 text-gray-400 font-medium">
-                    Tidak ada barang ditemukan di batch ini.
+                <!-- TOMBOL KIRIM LAPORAN KE GOOGLE SHEETS -->
+                <div v-if="pickingData.length > 0" class="pt-6 pb-2">
+                    <button @click="submitBatch" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl shadow-lg border border-slate-700 flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                        <span>✅ Selesaikan Batch & Laporkan</span>
+                    </button>
+                    <p class="text-[10px] text-center text-gray-400 mt-2">Selisih barang akan dikirim ke Spreadsheet</p>
                 </div>
             </div>
         </div>
@@ -248,11 +264,10 @@
             data() {
                 return {
                     apiUrl: 'https://script.google.com/macros/s/AKfycbw-Hlly2gks4HjfRIdD0xL3l7Uhc7I-R2dRaGWYgFMY7qkhRWOYLcSQuEuqHCMLnnsL/exec',
-                    currentView: 'splash', // splash, rute, batch, picking
+                    currentView: 'splash',
                     menuOpen: false,
                     loading: false,
                     rawData: [],
-                    // State untuk Picking
                     selectedBatchData: null,
                     pickingData: [],
                     pickedItems: [] 
@@ -298,30 +313,34 @@
                             alert(result.message);
                         }
                     } catch (error) {
-                        alert('Gagal terhubung ke server Google.');
+                        alert('Gagal terhubung ke server.');
                     } finally {
                         this.loading = false;
                     }
                 },
-                // Fungsi navigasi ke halaman Ceklis Barang
                 async goToPicking(batch) {
                     this.selectedBatchData = batch;
                     this.currentView = 'picking';
                     this.loading = true;
                     this.pickingData = [];
-                    this.pickedItems = []; // Reset ceklis saat masuk batch baru
+                    this.pickedItems = []; 
                     
                     try {
-                        // Menggunakan default action untuk menarik Picker Item List
                         const response = await fetch(`${this.apiUrl}?action=detail`);
                         const result = await response.json();
                         if (result.status === 'success') {
-                            // Saring (Filter) barang HANYA untuk Batch & Shift yang diklik
                             this.pickingData = result.data.filter(item => 
                                 item['Batch'] == batch['Batch'] && 
                                 item['Shift'] == batch['Shift'] && 
                                 item['Nama Barang'] !== '[DAFTAR TOKO]'
-                            );
+                            ).map(item => ({
+                                ...item,
+                                editMode: false,
+                                qtyT1: parseInt(item['Toko 1 (merah)']) || 0,
+                                qtyT2: parseInt(item['Toko 2 (hijau)']) || 0,
+                                qtyT3: parseInt(item['Toko 3 (kuning)']) || 0,
+                                qtyT4: parseInt(item['Toko 4 (biru)']) || 0
+                            }));
                         } else {
                             alert(result.message);
                         }
@@ -341,6 +360,55 @@
                 },
                 isPicked(itemName) {
                     return this.pickedItems.includes(itemName);
+                },
+                // FUNGSI MENGIRIM LAPORAN KE SPREADSHEET
+                async submitBatch() {
+                    let discrepancies = [];
+                    // Deteksi jika ada perubahan kuantitas
+                    this.pickingData.forEach(item => {
+                        const stores = [
+                            { nama: this.selectedBatchData['Toko 1 (merah)'], qtyAsli: parseInt(item['Toko 1 (merah)']) || 0, qtyBaru: item.qtyT1 },
+                            { nama: this.selectedBatchData['Toko 2 (hijau)'], qtyAsli: parseInt(item['Toko 2 (hijau)']) || 0, qtyBaru: item.qtyT2 },
+                            { nama: this.selectedBatchData['Toko 3 (kuning)'], qtyAsli: parseInt(item['Toko 3 (kuning)']) || 0, qtyBaru: item.qtyT3 },
+                            { nama: this.selectedBatchData['Toko 4 (biru)'], qtyAsli: parseInt(item['Toko 4 (biru)']) || 0, qtyBaru: item.qtyT4 }
+                        ];
+                        
+                        stores.forEach(s => {
+                            if (s.nama !== '-' && s.qtyAsli !== s.qtyBaru) {
+                                discrepancies.push({
+                                    batch: this.selectedBatchData['Batch'],
+                                    shift: this.selectedBatchData['Shift'],
+                                    kategori: item['Kategori'],
+                                    nama_barang: item['Nama Barang'],
+                                    toko: s.nama,
+                                    qty_seharusnya: s.qtyAsli,
+                                    qty_aktual: s.qtyBaru,
+                                    selisih: s.qtyBaru - s.qtyAsli
+                                });
+                            }
+                        });
+                    });
+                    
+                    if (discrepancies.length > 0) {
+                        this.loading = true;
+                        try {
+                            // Kirim sebagai teks agar tidak ditolak sistem keamanan (CORS) Google
+                            await fetch(this.apiUrl, {
+                                method: 'POST',
+                                body: JSON.stringify({ reports: discrepancies }),
+                                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                            });
+                            alert("✅ Laporan selisih berhasil dikirim ke Spreadsheet Anda!");
+                        } catch(e) {
+                            alert("❌ Gagal mengirim laporan. Periksa koneksi Anda.");
+                        }
+                        this.loading = false;
+                    } else {
+                        alert("✅ Batch diselesaikan tanpa ada selisih (sempurna)!");
+                    }
+                    
+                    // Kembali ke menu daftar batch
+                    this.currentView = 'batch';
                 }
             }
         }).mount('#app');
