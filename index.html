@@ -8,71 +8,62 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Press+Start+2P&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Press+Start+2P&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lottie Player -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #ffffff; overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
         .font-marker { font-family: 'Permanent Marker', cursive; }
         .font-pixel { font-family: 'Press Start 2P', cursive; }
+        
         .bottom-sheet { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .sheet-hidden { transform: translateY(100%); }
         .sheet-visible { transform: translateY(0); }
+        
         .clickable-card { transition: all 0.2s ease; cursor: pointer; }
         .clickable-card:active { transform: scale(0.98); }
-        .item-card { transition: all 0.3s ease; }
-        /* PERBAIKAN: Menghapus pointer-events: none agar kartu tetap bisa diklik untuk batal */
+        
         .dimmed { opacity: 0.5; filter: grayscale(80%); } 
         
-        /* Animasi Running Light VAPEBOSS */
+        /* Hide scrollbar untuk filter Pills */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Animasi Neon VAPEBOSS */
         .neon-marquee-container {
-            width: 100%;
-            overflow: hidden;
-            background-color: #000;
-            padding: 15px 0;
-            border-radius: 12px;
-            border: 3px solid #333;
-            box-shadow: inset 0 0 10px rgba(0,255,0,0.2);
-            position: relative;
+            width: 100%; overflow: hidden; background-color: #000;
+            padding: 15px 0; border-radius: 12px; border: 3px solid #333;
+            box-shadow: inset 0 0 10px rgba(0,255,0,0.2); position: relative;
         }
         .neon-marquee {
-            display: inline-block;
-            white-space: nowrap;
-            animation: marquee 4s linear infinite;
-            font-size: 28px;
-            color: #0f0;
-            text-shadow: 0 0 5px #0f0, 0 0 10px #0f0, 0 0 20px #0f0, 0 0 40px #0f0;
+            display: inline-block; white-space: nowrap; animation: marquee 4s linear infinite;
+            font-size: 28px; color: #0f0; text-shadow: 0 0 5px #0f0, 0 0 10px #0f0, 0 0 20px #0f0, 0 0 40px #0f0;
         }
-        @keyframes marquee {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
+        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        
+        /* Animasi Tombol Mengambang */
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+        .fade-enter-from, .fade-leave-to { opacity: 0; }
     </style>
 </head>
-<body class="text-gray-900 bg-white">
-    <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden shadow-2xl bg-gray-50 flex flex-col">
+<body class="text-gray-900">
+    <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden shadow-2xl bg-slate-50 flex flex-col">
         
-        <!-- SPLASH SCREEN -->
+        <!-- ================= SPLASH SCREEN ================= -->
         <div v-if="currentView === 'splash'" class="flex flex-col items-center justify-center flex-1 p-6 text-center relative z-10 bg-white">
             <h1 class="font-marker text-4xl leading-tight mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">
                 WELLCOME<br><span class="text-black">TO</span><br>PORTAL<br>PICKER
             </h1>
-            
-            <!-- VAPEBOSS Running Light Animation -->
             <div class="w-full max-w-[280px] mb-8">
-                <div class="neon-marquee-container">
-                    <span class="neon-marquee font-pixel">VAPEBOSS</span>
-                </div>
+                <div class="neon-marquee-container"><span class="neon-marquee font-pixel">VAPEBOSS</span></div>
             </div>
-
-            <h2 class="font-marker text-3xl text-black drop-shadow-md mb-12 leading-snug">
-                SEMANGAT KERJA !!!<br>AND<br>LETS THRIVING
-            </h2>
-
+            <h2 class="font-marker text-3xl text-black drop-shadow-md mb-12 leading-snug">SEMANGAT KERJA !!!<br>AND<br>LETS THRIVING</h2>
             <button @click="menuOpen = true" class="font-pixel text-xl text-purple-900 bg-gradient-to-r from-yellow-400 via-yellow-300 to-pink-400 px-8 py-4 rounded-full border-4 border-pink-500 shadow-[0_8px_0_rgb(236,72,153)] hover:translate-y-1 transition-all active:shadow-none active:translate-y-2 mt-4">
                 MENU
             </button>
         </div>
 
-        <!-- BOTTOM SHEET -->
+        <!-- ================= BOTTOM SHEET ================= -->
         <div class="absolute inset-0 bg-black/60 z-40 transition-opacity duration-300" :class="menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'" @click="menuOpen = false"></div>
         <div class="bottom-sheet absolute bottom-0 left-0 right-0 bg-[#d4e157] rounded-t-3xl p-8 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.3)]" :class="menuOpen ? 'sheet-visible' : 'sheet-hidden'">
             <div class="w-16 h-1.5 bg-black/20 rounded-full mx-auto mb-8"></div>
@@ -83,178 +74,196 @@
             <div class="pb-10"></div>
         </div>
 
-        <!-- HALAMAN RUTE / BATCH SUMMARY -->
+        <!-- ================= HALAMAN RUTE / BATCH SUMMARY ================= -->
         <div v-if="currentView === 'rute' || currentView === 'batch'" class="flex-1 pb-20 relative z-20">
-            <div class="bg-slate-900 text-white p-4 sticky top-0 z-30 shadow-md flex items-center justify-between">
-                <button @click="currentView = 'splash'" class="bg-slate-800 p-2 rounded-lg text-sm font-bold flex items-center hover:bg-slate-700">⬅ Kembali</button>
-                <h2 class="font-bold text-lg">{{ currentView === 'rute' ? 'Daftar Rute' : 'Pilih Batch' }}</h2>
-                <button @click="fetchData(currentView)" class="bg-emerald-600 p-2 rounded-lg text-sm font-bold hover:bg-emerald-500">🔄</button>
+            <div class="bg-slate-900 text-white p-3 sticky top-0 z-30 shadow-md flex items-center justify-between">
+                <button @click="currentView = 'splash'" class="bg-slate-800 px-2 py-1.5 rounded text-xs font-bold flex items-center hover:bg-slate-700">⬅ Kembali</button>
+                <h2 class="font-bold text-base">{{ currentView === 'rute' ? 'Daftar Rute' : 'Pilih Batch' }}</h2>
+                <button @click="fetchData(currentView)" class="bg-emerald-600 px-2 py-1.5 rounded text-xs font-bold hover:bg-emerald-500">🔄</button>
             </div>
 
             <div v-if="loading" class="flex flex-col items-center justify-center pt-20">
-                <div class="animate-spin w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full mb-3"></div>
-                <p class="text-gray-500 font-medium">Menarik data server...</p>
+                <div class="animate-spin w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full mb-3"></div>
+                <p class="text-gray-500 text-sm font-medium">Menarik data server...</p>
             </div>
 
-            <div v-if="!loading" class="p-4 space-y-4">
-                
+            <div v-if="!loading" class="p-3 space-y-3">
                 <!-- LIST RUTE -->
                 <div v-if="currentView === 'rute'">
-                    <div v-for="(cabangList, shiftName) in groupedRoutes" :key="shiftName" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-5">
-                        <div class="bg-[#d4e157] px-4 py-3 border-b border-gray-200"><h3 class="font-bold text-gray-900 text-sm uppercase">{{ shiftName }}</h3></div>
+                    <div v-for="(cabangList, shiftName) in groupedRoutes" :key="shiftName" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-4">
+                        <div class="bg-[#d4e157] px-3 py-2 border-b border-gray-200"><h3 class="font-bold text-gray-900 text-xs uppercase">{{ shiftName }}</h3></div>
                         <ul class="divide-y divide-gray-100">
-                            <li v-for="cabang in cabangList" class="px-4 py-3 text-sm text-gray-700 font-medium flex items-center gap-3"><span class="w-2 h-2 rounded-full bg-emerald-500 block"></span>{{ cabang }}</li>
+                            <li v-for="cabang in cabangList" class="px-3 py-2 text-xs text-gray-700 font-medium flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 block"></span>{{ cabang }}</li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- BATCH SUMMARY -->
                 <div v-if="currentView === 'batch'">
-                    <div v-for="(batch, index) in rawData" :key="index" @click="goToPicking(batch)" class="clickable-card bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden mb-5">
-                        <div class="bg-slate-900 text-white px-5 py-4 flex justify-between items-center">
-                            <h3 class="font-black text-xl">BATCH {{ batch['Batch'] }}</h3>
-                            <span class="text-[10px] font-semibold bg-slate-700 px-2 py-1 rounded-full text-right leading-tight max-w-[140px]">{{ batch['Shift'] }}</span>
+                    <div v-for="(batch, index) in rawData" :key="index" @click="goToPicking(batch)" class="clickable-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-4">
+                        <div class="bg-slate-900 text-white px-4 py-3 flex justify-between items-center">
+                            <h3 class="font-black text-lg">BATCH {{ batch['Batch'] }}</h3>
+                            <span class="text-[9px] font-semibold bg-slate-700 px-2 py-1 rounded-full text-right max-w-[130px] truncate">{{ batch['Shift'] }}</span>
                         </div>
-                        <div class="p-4 grid grid-cols-2 gap-3">
-                            <div v-if="batch['Toko 1 (merah)'] !== '-'" class="bg-red-50 border border-red-200 rounded-lg p-2 text-center">
-                                <p class="text-[9px] font-bold text-red-600 mb-1">TOKO 1</p><p class="text-xs font-semibold text-red-900 leading-tight">{{ batch['Toko 1 (merah)'] }}</p>
-                            </div>
-                            <div v-if="batch['Toko 2 (hijau)'] !== '-'" class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-center">
-                                <p class="text-[9px] font-bold text-emerald-600 mb-1">TOKO 2</p><p class="text-xs font-semibold text-emerald-900 leading-tight">{{ batch['Toko 2 (hijau)'] }}</p>
-                            </div>
-                            <div v-if="batch['Toko 3 (kuning)'] !== '-'" class="bg-yellow-50 border border-yellow-300 rounded-lg p-2 text-center">
-                                <p class="text-[9px] font-bold text-yellow-700 mb-1">TOKO 3</p><p class="text-xs font-semibold text-yellow-900 leading-tight">{{ batch['Toko 3 (kuning)'] }}</p>
-                            </div>
-                            <div v-if="batch['Toko 4 (biru)'] !== '-'" class="bg-blue-50 border border-blue-200 rounded-lg p-2 text-center">
-                                <p class="text-[9px] font-bold text-blue-600 mb-1">TOKO 4</p><p class="text-xs font-semibold text-blue-900 leading-tight">{{ batch['Toko 4 (biru)'] }}</p>
-                            </div>
+                        <div class="p-3 grid grid-cols-2 gap-2">
+                            <div v-if="batch['Toko 1 (merah)'] !== '-'" class="bg-red-50 border border-red-200 rounded p-1.5 text-center"><p class="text-[9px] font-semibold text-red-900 leading-tight line-clamp-2">{{ batch['Toko 1 (merah)'] }}</p></div>
+                            <div v-if="batch['Toko 2 (hijau)'] !== '-'" class="bg-emerald-50 border border-emerald-200 rounded p-1.5 text-center"><p class="text-[9px] font-semibold text-emerald-900 leading-tight line-clamp-2">{{ batch['Toko 2 (hijau)'] }}</p></div>
+                            <div v-if="batch['Toko 3 (kuning)'] !== '-'" class="bg-yellow-50 border border-yellow-300 rounded p-1.5 text-center"><p class="text-[9px] font-semibold text-yellow-900 leading-tight line-clamp-2">{{ batch['Toko 3 (kuning)'] }}</p></div>
+                            <div v-if="batch['Toko 4 (biru)'] !== '-'" class="bg-blue-50 border border-blue-200 rounded p-1.5 text-center"><p class="text-[9px] font-semibold text-blue-900 leading-tight line-clamp-2">{{ batch['Toko 4 (biru)'] }}</p></div>
                         </div>
-                        <div class="bg-gray-50 py-3 px-2 border-t border-gray-100 grid grid-cols-4 divide-x divide-gray-200 text-center">
-                            <div><p class="text-[8px] text-gray-500 font-bold uppercase">Identik</p><p class="text-xs font-black text-gray-800">{{ batch['Identik (4 Item)'] }}</p></div>
-                            <div><p class="text-[8px] text-gray-500 font-bold uppercase">Multi</p><p class="text-xs font-black text-gray-800">{{ batch['Multi (3 Item)'] }}</p></div>
-                            <div><p class="text-[8px] text-gray-500 font-bold uppercase">Semi</p><p class="text-xs font-black text-gray-800">{{ batch['Semi (2 Item)'] }}</p></div>
-                            <div><p class="text-[8px] text-gray-500 font-bold uppercase">T.Identik</p><p class="text-xs font-black text-gray-800">{{ batch['Tidak Identik (1 Item)'] }}</p></div>
+                        <div class="bg-gray-50 py-2 border-t border-gray-100 grid grid-cols-4 divide-x divide-gray-200 text-center">
+                            <div><p class="text-[7px] text-gray-500 font-bold uppercase">Identik</p><p class="text-[11px] font-black text-gray-800">{{ batch['Identik (4 Item)'] }}</p></div>
+                            <div><p class="text-[7px] text-gray-500 font-bold uppercase">Multi</p><p class="text-[11px] font-black text-gray-800">{{ batch['Multi (3 Item)'] }}</p></div>
+                            <div><p class="text-[7px] text-gray-500 font-bold uppercase">Semi</p><p class="text-[11px] font-black text-gray-800">{{ batch['Semi (2 Item)'] }}</p></div>
+                            <div><p class="text-[7px] text-gray-500 font-bold uppercase">T.Identik</p><p class="text-[11px] font-black text-gray-800">{{ batch['Tidak Identik (1 Item)'] }}</p></div>
                         </div>
-                        <div class="bg-emerald-50 p-3 text-center border-t border-emerald-200">
-                            <span class="text-emerald-700 font-bold text-sm flex justify-center items-center gap-1">
-                                📦 Mulai Ambil Barang ({{ batch['Total SKU'] }} SKU) <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                            </span>
+                        <div class="bg-emerald-50 py-2.5 text-center border-t border-emerald-200">
+                            <span class="text-emerald-700 font-bold text-xs flex justify-center items-center gap-1">📦 Mulai Ambil ({{ batch['Total SKU'] }} SKU)</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- HALAMAN PICKING BARANG -->
-        <div v-if="currentView === 'picking'" class="flex-1 pb-20 relative z-20">
-            <div class="bg-slate-900 text-white sticky top-0 z-30 shadow-md flex flex-col">
-                <div class="p-4 pb-3">
-                    <div class="flex items-center justify-between mb-3">
-                        <button @click="currentView = 'batch'" class="bg-slate-800 p-2 rounded-lg text-sm font-bold flex items-center hover:bg-slate-700">⬅ Batal</button>
+        <!-- ================= HALAMAN PICKING (HIGH DENSITY UI) ================= -->
+        <div v-if="currentView === 'picking'" class="flex-1 pb-24 relative z-20">
+            <!-- 1. FREEZE PANEL: Navigasi, Progress, Toko, Tab, Filter -->
+            <div class="sticky top-0 z-30 flex flex-col shadow-md">
+                
+                <!-- Nav & Progress -->
+                <div class="bg-slate-900 text-white px-3 py-2">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <button @click="currentView = 'batch'" class="bg-slate-800 px-2 py-1 rounded text-[10px] font-bold flex items-center hover:bg-slate-700">⬅ Batal</button>
                         <div class="text-right">
-                            <h2 class="font-bold text-lg leading-tight">Batch {{ selectedBatchData['Batch'] }}</h2>
-                            <p class="text-[10px] text-slate-300 truncate max-w-[150px]">{{ selectedBatchData['Shift'] }}</p>
+                            <h2 class="font-bold text-sm leading-none">Batch {{ selectedBatchData['Batch'] }}</h2>
+                            <p class="text-[9px] text-slate-300 truncate max-w-[130px] mt-0.5">{{ selectedBatchData['Shift'] }}</p>
                         </div>
                     </div>
                     <div v-if="!loading && pickingData.length > 0">
-                        <div class="flex justify-between text-xs text-slate-300 mb-1">
-                            <span>Progres: {{ pickedCount }} / {{ pickingData.length }} Item</span><span>{{ progressPercent }}%</span>
+                        <div class="flex justify-between text-[9px] text-slate-300 mb-0.5">
+                            <span>Progres: {{ pickedCount }}/{{ pickingData.length }}</span><span>{{ progressPercent }}%</span>
                         </div>
-                        <div class="w-full bg-slate-700 rounded-full h-2"><div class="bg-[#d4e157] h-2 rounded-full transition-all duration-500" :style="`width: ${progressPercent}%`"></div></div>
+                        <div class="w-full bg-slate-700 rounded-full h-1.5"><div class="bg-[#d4e157] h-1.5 rounded-full transition-all duration-300" :style="`width: ${progressPercent}%`"></div></div>
                     </div>
                 </div>
 
-                <!-- Freeze Panel Toko -->
-                <div v-if="selectedBatchData && !loading" class="bg-white border-b border-gray-200 px-3 py-2 grid grid-cols-2 gap-1.5 shadow-sm">
-                    <div v-if="selectedBatchData['Toko 1 (merah)'] !== '-'" class="flex items-center gap-1 bg-red-50 text-red-900 text-[9px] font-bold p-1.5 rounded border border-red-200"><span class="bg-red-500 text-white px-1.5 py-0.5 rounded">T1</span><span class="truncate">{{ selectedBatchData['Toko 1 (merah)'] }}</span></div>
-                    <div v-if="selectedBatchData['Toko 2 (hijau)'] !== '-'" class="flex items-center gap-1 bg-emerald-50 text-emerald-900 text-[9px] font-bold p-1.5 rounded border border-emerald-200"><span class="bg-emerald-500 text-white px-1.5 py-0.5 rounded">T2</span><span class="truncate">{{ selectedBatchData['Toko 2 (hijau)'] }}</span></div>
-                    <div v-if="selectedBatchData['Toko 3 (kuning)'] !== '-'" class="flex items-center gap-1 bg-yellow-50 text-yellow-900 text-[9px] font-bold p-1.5 rounded border border-yellow-300"><span class="bg-yellow-400 text-white px-1.5 py-0.5 rounded">T3</span><span class="truncate">{{ selectedBatchData['Toko 3 (kuning)'] }}</span></div>
-                    <div v-if="selectedBatchData['Toko 4 (biru)'] !== '-'" class="flex items-center gap-1 bg-blue-50 text-blue-900 text-[9px] font-bold p-1.5 rounded border border-blue-200"><span class="bg-blue-500 text-white px-1.5 py-0.5 rounded">T4</span><span class="truncate">{{ selectedBatchData['Toko 4 (biru)'] }}</span></div>
+                <!-- Nama Toko (Tanpa T1-T4, Padat) -->
+                <div v-if="selectedBatchData && !loading" class="bg-white px-2 py-1.5 grid grid-cols-2 gap-1 border-b border-gray-200">
+                    <div v-if="selectedBatchData['Toko 1 (merah)'] !== '-'" class="bg-red-50 text-red-900 text-[9px] font-bold px-1.5 py-1 rounded border border-red-200 text-center truncate">{{ selectedBatchData['Toko 1 (merah)'] }}</div>
+                    <div v-if="selectedBatchData['Toko 2 (hijau)'] !== '-'" class="bg-emerald-50 text-emerald-900 text-[9px] font-bold px-1.5 py-1 rounded border border-emerald-200 text-center truncate">{{ selectedBatchData['Toko 2 (hijau)'] }}</div>
+                    <div v-if="selectedBatchData['Toko 3 (kuning)'] !== '-'" class="bg-yellow-50 text-yellow-900 text-[9px] font-bold px-1.5 py-1 rounded border border-yellow-300 text-center truncate">{{ selectedBatchData['Toko 3 (kuning)'] }}</div>
+                    <div v-if="selectedBatchData['Toko 4 (biru)'] !== '-'" class="bg-blue-50 text-blue-900 text-[9px] font-bold px-1.5 py-1 rounded border border-blue-200 text-center truncate">{{ selectedBatchData['Toko 4 (biru)'] }}</div>
+                </div>
+
+                <!-- Tab Status (Belum / Selesai) -->
+                <div v-if="!loading" class="bg-gray-100 flex text-[10px] font-bold border-b border-gray-200">
+                    <button @click="activeTab = 'BELUM'" class="flex-1 py-1.5 transition-colors" :class="activeTab === 'BELUM' ? 'bg-white text-emerald-600 border-b-2 border-emerald-500' : 'text-gray-500'">BELUM ({{ pickingData.length - pickedCount }})</button>
+                    <button @click="activeTab = 'SELESAI'" class="flex-1 py-1.5 transition-colors" :class="activeTab === 'SELESAI' ? 'bg-white text-emerald-600 border-b-2 border-emerald-500' : 'text-gray-500'">SELESAI ({{ pickedCount }})</button>
+                </div>
+
+                <!-- Search & Kategori Pills -->
+                <div v-if="!loading" class="bg-white p-2 border-b border-gray-200 shadow-sm">
+                    <input v-model="searchQuery" type="text" placeholder="🔍 Cari nama barang..." class="w-full bg-gray-50 border border-gray-200 text-xs rounded-md px-3 py-1.5 mb-2 focus:outline-none focus:border-emerald-500">
+                    <div class="flex gap-1.5 overflow-x-auto hide-scrollbar pb-0.5">
+                        <button v-for="cat in categoriesList" :key="cat" @click="activeCategory = cat" class="whitespace-nowrap px-3 py-1 rounded-full text-[9px] font-bold border transition-colors" :class="activeCategory === cat ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-gray-600 border-gray-300'">{{ cat }}</button>
+                    </div>
                 </div>
             </div>
 
+            <!-- Loading Spinner -->
             <div v-if="loading" class="flex flex-col items-center justify-center pt-20">
-                <div class="animate-spin w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full mb-3"></div>
-                <p class="text-gray-500 font-medium">Memuat data...</p>
+                <div class="animate-spin w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full mb-3"></div>
+                <p class="text-gray-500 text-sm font-medium">Memuat data...</p>
             </div>
 
-            <div v-if="!loading" class="p-4 space-y-3">
-                <div v-for="(item, index) in pickingData" :key="index" class="item-card bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col overflow-hidden" :class="{ 'dimmed': isPicked(item['Nama Barang']) }">
+            <!-- DAFTAR KARTU BARANG PADAT -->
+            <div v-if="!loading" class="p-2 space-y-2">
+                <div v-for="(item, index) in filteredPickingData" :key="item['Nama Barang']" class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col overflow-hidden" :class="{ 'dimmed': isPicked(item['Nama Barang']) }">
                     <div class="flex">
-                        <div class="p-3 flex-1 border-r border-gray-100">
-                            <div class="flex justify-between items-start mb-1">
-                                <span class="text-[10px] uppercase font-bold text-gray-400">{{ item['Kategori'] }}</span>
-                                <span class="bg-slate-800 text-white text-[11px] font-bold px-2 py-0.5 rounded">TOTAL: {{ item.qtyT1 + item.qtyT2 + item.qtyT3 + item.qtyT4 }}</span>
+                        <!-- Kiri: Info -->
+                        <div class="p-2 flex-1 border-r border-gray-100 flex flex-col justify-center">
+                            <!-- Kategori & Total Sejajar -->
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[9px] font-black text-gray-400 uppercase tracking-wider bg-gray-100 px-1.5 py-0.5 rounded">{{ item['Kategori'] }}</span>
+                                <span class="text-[9px] font-black text-slate-800 bg-[#d4e157] px-1.5 py-0.5 rounded">TOTAL: {{ item.qtyT1 + item.qtyT2 + item.qtyT3 + item.qtyT4 }}</span>
                             </div>
-                            <h2 class="text-sm font-bold text-gray-800 leading-snug mb-3">{{ item['Nama Barang'] }}</h2>
+                            <!-- Nama Barang -->
+                            <h2 class="text-xs font-bold text-gray-900 leading-tight mb-2">{{ item['Nama Barang'] }}</h2>
                             
-                            <!-- Grid Kuantitas & Edit (-) (+) -->
-                            <div class="flex flex-wrap gap-2">
-                                <div v-if="item['Toko 1 (merah)'] > 0" class="bg-red-50 text-red-800 border border-red-200 rounded p-1.5 min-w-[42px] flex flex-col items-center">
-                                    <span class="text-[9px] font-bold mb-0.5">T-1</span>
-                                    <div v-if="!item.editMode" class="text-center">
-                                        <span class="text-sm font-black" :class="{'text-red-400 line-through text-xs': item.qtyT1 !== item['Toko 1 (merah)']}">{{ item['Toko 1 (merah)'] }}</span>
-                                        <span v-if="item.qtyT1 !== item['Toko 1 (merah)']" class="text-sm font-black text-red-700 block leading-none">{{ item.qtyT1 }}</span>
+                            <!-- Kuantitas Kotak Kecil -->
+                            <div class="flex flex-wrap gap-1">
+                                <div v-if="item['Toko 1 (merah)'] > 0" class="bg-red-50 text-red-900 border border-red-200 rounded px-1.5 py-0.5 min-w-[28px] text-center">
+                                    <div v-if="!item.editMode">
+                                        <span class="text-[11px] font-black block leading-none mt-0.5" :class="{'text-red-300 line-through text-[9px]': item.qtyT1 !== item['Toko 1 (merah)']}">{{ item['Toko 1 (merah)'] }}</span>
+                                        <span v-if="item.qtyT1 !== item['Toko 1 (merah)']" class="text-[11px] font-black text-red-700 block leading-none">{{ item.qtyT1 }}</span>
                                     </div>
-                                    <div v-else class="flex items-center gap-1"><button @click.stop="item.qtyT1 > 0 ? item.qtyT1-- : null" class="bg-red-200 rounded h-5 w-5 font-bold">-</button><span class="text-xs font-black w-3 text-center">{{ item.qtyT1 }}</span><button @click.stop="item.qtyT1++" class="bg-red-200 rounded h-5 w-5 font-bold">+</button></div>
+                                    <div v-else class="flex items-center justify-between gap-1 mt-0.5"><button @click.stop="item.qtyT1 > 0 ? item.qtyT1-- : null" class="bg-red-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT1 }}</span><button @click.stop="item.qtyT1++" class="bg-red-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
                                 </div>
                                 
-                                <div v-if="item['Toko 2 (hijau)'] > 0" class="bg-emerald-50 text-emerald-800 border border-emerald-200 rounded p-1.5 min-w-[42px] flex flex-col items-center">
-                                    <span class="text-[9px] font-bold mb-0.5">T-2</span>
-                                    <div v-if="!item.editMode" class="text-center">
-                                        <span class="text-sm font-black" :class="{'text-emerald-400 line-through text-xs': item.qtyT2 !== item['Toko 2 (hijau)']}">{{ item['Toko 2 (hijau)'] }}</span>
-                                        <span v-if="item.qtyT2 !== item['Toko 2 (hijau)']" class="text-sm font-black text-emerald-700 block leading-none">{{ item.qtyT2 }}</span>
+                                <div v-if="item['Toko 2 (hijau)'] > 0" class="bg-emerald-50 text-emerald-900 border border-emerald-200 rounded px-1.5 py-0.5 min-w-[28px] text-center">
+                                    <div v-if="!item.editMode">
+                                        <span class="text-[11px] font-black block leading-none mt-0.5" :class="{'text-emerald-300 line-through text-[9px]': item.qtyT2 !== item['Toko 2 (hijau)']}">{{ item['Toko 2 (hijau)'] }}</span>
+                                        <span v-if="item.qtyT2 !== item['Toko 2 (hijau)']" class="text-[11px] font-black text-emerald-700 block leading-none">{{ item.qtyT2 }}</span>
                                     </div>
-                                    <div v-else class="flex items-center gap-1"><button @click.stop="item.qtyT2 > 0 ? item.qtyT2-- : null" class="bg-emerald-200 rounded h-5 w-5 font-bold">-</button><span class="text-xs font-black w-3 text-center">{{ item.qtyT2 }}</span><button @click.stop="item.qtyT2++" class="bg-emerald-200 rounded h-5 w-5 font-bold">+</button></div>
+                                    <div v-else class="flex items-center justify-between gap-1 mt-0.5"><button @click.stop="item.qtyT2 > 0 ? item.qtyT2-- : null" class="bg-emerald-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT2 }}</span><button @click.stop="item.qtyT2++" class="bg-emerald-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
                                 </div>
 
-                                <div v-if="item['Toko 3 (kuning)'] > 0" class="bg-yellow-50 text-yellow-800 border border-yellow-300 rounded p-1.5 min-w-[42px] flex flex-col items-center">
-                                    <span class="text-[9px] font-bold mb-0.5">T-3</span>
-                                    <div v-if="!item.editMode" class="text-center">
-                                        <span class="text-sm font-black" :class="{'text-yellow-500 line-through text-xs': item.qtyT3 !== item['Toko 3 (kuning)']}">{{ item['Toko 3 (kuning)'] }}</span>
-                                        <span v-if="item.qtyT3 !== item['Toko 3 (kuning)']" class="text-sm font-black text-yellow-700 block leading-none">{{ item.qtyT3 }}</span>
+                                <div v-if="item['Toko 3 (kuning)'] > 0" class="bg-yellow-50 text-yellow-900 border border-yellow-300 rounded px-1.5 py-0.5 min-w-[28px] text-center">
+                                    <div v-if="!item.editMode">
+                                        <span class="text-[11px] font-black block leading-none mt-0.5" :class="{'text-yellow-400 line-through text-[9px]': item.qtyT3 !== item['Toko 3 (kuning)']}">{{ item['Toko 3 (kuning)'] }}</span>
+                                        <span v-if="item.qtyT3 !== item['Toko 3 (kuning)']" class="text-[11px] font-black text-yellow-700 block leading-none">{{ item.qtyT3 }}</span>
                                     </div>
-                                    <div v-else class="flex items-center gap-1"><button @click.stop="item.qtyT3 > 0 ? item.qtyT3-- : null" class="bg-yellow-200 rounded h-5 w-5 font-bold">-</button><span class="text-xs font-black w-3 text-center">{{ item.qtyT3 }}</span><button @click.stop="item.qtyT3++" class="bg-yellow-200 rounded h-5 w-5 font-bold">+</button></div>
+                                    <div v-else class="flex items-center justify-between gap-1 mt-0.5"><button @click.stop="item.qtyT3 > 0 ? item.qtyT3-- : null" class="bg-yellow-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT3 }}</span><button @click.stop="item.qtyT3++" class="bg-yellow-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
                                 </div>
 
-                                <div v-if="item['Toko 4 (biru)'] > 0" class="bg-blue-50 text-blue-800 border border-blue-200 rounded p-1.5 min-w-[42px] flex flex-col items-center">
-                                    <span class="text-[9px] font-bold mb-0.5">T-4</span>
-                                    <div v-if="!item.editMode" class="text-center">
-                                        <span class="text-sm font-black" :class="{'text-blue-400 line-through text-xs': item.qtyT4 !== item['Toko 4 (biru)']}">{{ item['Toko 4 (biru)'] }}</span>
-                                        <span v-if="item.qtyT4 !== item['Toko 4 (biru)']" class="text-sm font-black text-blue-700 block leading-none">{{ item.qtyT4 }}</span>
+                                <div v-if="item['Toko 4 (biru)'] > 0" class="bg-blue-50 text-blue-900 border border-blue-200 rounded px-1.5 py-0.5 min-w-[28px] text-center">
+                                    <div v-if="!item.editMode">
+                                        <span class="text-[11px] font-black block leading-none mt-0.5" :class="{'text-blue-300 line-through text-[9px]': item.qtyT4 !== item['Toko 4 (biru)']}">{{ item['Toko 4 (biru)'] }}</span>
+                                        <span v-if="item.qtyT4 !== item['Toko 4 (biru)']" class="text-[11px] font-black text-blue-700 block leading-none">{{ item.qtyT4 }}</span>
                                     </div>
-                                    <div v-else class="flex items-center gap-1"><button @click.stop="item.qtyT4 > 0 ? item.qtyT4-- : null" class="bg-blue-200 rounded h-5 w-5 font-bold">-</button><span class="text-xs font-black w-3 text-center">{{ item.qtyT4 }}</span><button @click.stop="item.qtyT4++" class="bg-blue-200 rounded h-5 w-5 font-bold">+</button></div>
+                                    <div v-else class="flex items-center justify-between gap-1 mt-0.5"><button @click.stop="item.qtyT4 > 0 ? item.qtyT4-- : null" class="bg-blue-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT4 }}</span><button @click.stop="item.qtyT4++" class="bg-blue-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Tombol Ambil -->
-                        <button @click="togglePick(item['Nama Barang'])" class="w-20 flex flex-col items-center justify-center transition-colors" :class="isPicked(item['Nama Barang']) ? 'bg-gray-100 text-gray-400' : 'bg-[#d4e157] hover:bg-[#cddc39] text-slate-800'">
-                            <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            <span class="text-[10px] font-bold tracking-wide" v-text="isPicked(item['Nama Barang']) ? 'BATAL' : 'AMBIL'"></span>
+                        <!-- Kanan: Tombol Action -->
+                        <button @click="togglePick(item['Nama Barang'])" class="w-16 flex flex-col items-center justify-center transition-colors" :class="isPicked(item['Nama Barang']) ? 'bg-gray-100 text-gray-400' : 'bg-[#d4e157] hover:bg-[#cddc39] text-slate-800'">
+                            <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                            <span class="text-[8px] font-black" v-text="isPicked(item['Nama Barang']) ? 'BATAL' : 'AMBIL'"></span>
                         </button>
                     </div>
 
-                    <!-- Pemicu Laporan Kurang -->
-                    <div class="bg-gray-50 p-2 flex justify-between items-center px-3 border-t border-gray-100">
-                        <button v-if="!item.editMode && !isPicked(item['Nama Barang'])" @click.stop="item.editMode = true" class="text-[10px] text-amber-600 font-bold flex items-center gap-1 bg-amber-50 px-2 py-1.5 rounded hover:bg-amber-100 border border-amber-200">
-                            ⚠️ Stok Fisik Kurang?
+                    <!-- Panel Lapor Selisih -->
+                    <div class="bg-gray-50 py-1.5 px-2 flex justify-between items-center border-t border-gray-100">
+                        <button v-if="!item.editMode && !isPicked(item['Nama Barang'])" @click.stop="item.editMode = true" class="text-[9px] text-amber-600 font-bold flex items-center gap-1 bg-amber-50 px-1.5 py-1 rounded border border-amber-200">
+                            ⚠️ Fisik Kurang?
                         </button>
-                        <button v-if="item.editMode" @click.stop="item.editMode = false" class="text-[10px] text-white font-bold bg-amber-500 px-4 py-1.5 rounded shadow-sm w-full justify-center">
-                            ✅ Simpan Penyesuaian
+                        <button v-if="item.editMode" @click.stop="item.editMode = false" class="text-[9px] text-white font-bold bg-amber-500 px-3 py-1 rounded shadow-sm w-full text-center">
+                            ✅ Simpan
                         </button>
                     </div>
                 </div>
                 
-                <!-- TOMBOL KIRIM LAPORAN KE GOOGLE SHEETS -->
-                <div v-if="pickingData.length > 0" class="pt-6 pb-2">
-                    <button @click="submitBatch" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl shadow-lg border border-slate-700 flex items-center justify-center gap-2 active:scale-95 transition-transform">
-                        <span>✅ Selesaikan Batch & Laporkan</span>
+                <div v-if="filteredPickingData.length === 0" class="text-center py-10 text-gray-400 text-xs font-medium">
+                    Tidak ada barang di filter ini.
+                </div>
+                
+                <div v-if="filteredPickingData.length > 0 && activeTab === 'BELUM'" class="pt-4 pb-2">
+                    <button @click="submitBatch" class="w-full bg-slate-900 text-white font-bold py-3 rounded-lg shadow-lg border border-slate-700 flex items-center justify-center text-xs active:scale-95 transition-transform">
+                        ✅ Selesaikan Batch & Lapor
                     </button>
-                    <p class="text-[10px] text-center text-gray-400 mt-2">Selisih barang akan dikirim ke Spreadsheet</p>
                 </div>
             </div>
         </div>
+
+        <!-- ================= FLOATING BUTTON (SCROLL TO TOP) ================= -->
+        <transition name="fade">
+            <button v-if="showScrollTop && (currentView === 'picking' || currentView === 'batch' || currentView === 'rute')" 
+                    @click="scrollToTop" 
+                    class="fixed bottom-6 right-6 bg-[#d4e157] text-slate-800 p-3 rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.3)] z-50 hover:scale-110 transition-transform border-2 border-slate-800">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"></path></svg>
+            </button>
+        </transition>
 
     </div>
 
@@ -271,7 +280,15 @@
                     rawData: [],
                     selectedBatchData: null,
                     pickingData: [],
-                    pickedItems: [] 
+                    pickedItems: [],
+                    
+                    // Filter UI State
+                    activeTab: 'BELUM',
+                    activeCategory: 'Semua',
+                    searchQuery: '',
+                    
+                    // Scroll UI
+                    showScrollTop: false
                 }
             },
             computed: {
@@ -294,9 +311,46 @@
                 progressPercent() {
                     if (this.pickingData.length === 0) return 0;
                     return Math.round((this.pickedCount / this.pickingData.length) * 100);
+                },
+                categoriesList() {
+                    if (!this.pickingData.length) return ['Semua'];
+                    const cats = new Set(this.pickingData.map(item => item['Kategori']));
+                    return ['Semua', ...Array.from(cats).filter(c => c && c.trim() !== '')];
+                },
+                filteredPickingData() {
+                    let data = this.pickingData;
+                    
+                    if (this.activeTab === 'BELUM') {
+                        data = data.filter(item => !this.isPicked(item['Nama Barang']));
+                    } else if (this.activeTab === 'SELESAI') {
+                        data = data.filter(item => this.isPicked(item['Nama Barang']));
+                    }
+                    
+                    if (this.activeCategory !== 'Semua') {
+                        data = data.filter(item => item['Kategori'] === this.activeCategory);
+                    }
+                    
+                    if (this.searchQuery.trim() !== '') {
+                        const q = this.searchQuery.toLowerCase();
+                        data = data.filter(item => item['Nama Barang'].toLowerCase().includes(q));
+                    }
+                    
+                    return data;
                 }
             },
+            mounted() {
+                window.addEventListener('scroll', this.handleScroll);
+            },
+            unmounted() {
+                window.removeEventListener('scroll', this.handleScroll);
+            },
             methods: {
+                handleScroll() {
+                    this.showScrollTop = window.scrollY > 200;
+                },
+                scrollToTop() {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                },
                 openView(viewName) {
                     this.menuOpen = false;
                     this.currentView = viewName;
@@ -325,6 +379,13 @@
                     this.loading = true;
                     this.pickingData = [];
                     this.pickedItems = []; 
+                    
+                    // Reset filters
+                    this.activeTab = 'BELUM';
+                    this.activeCategory = 'Semua';
+                    this.searchQuery = '';
+                    
+                    window.scrollTo(0, 0);
                     
                     try {
                         const response = await fetch(`${this.apiUrl}?action=detail`);
@@ -396,15 +457,16 @@
                                 body: JSON.stringify({ reports: discrepancies }),
                                 headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                             });
-                            alert("✅ Laporan selisih berhasil dikirim ke Spreadsheet Anda!");
+                            alert("✅ Laporan selisih berhasil dikirim ke Spreadsheet!");
                         } catch(e) {
-                            alert("❌ Gagal mengirim laporan. Periksa koneksi Anda.");
+                            alert("❌ Gagal mengirim laporan.");
                         }
                         this.loading = false;
                     } else {
-                        alert("✅ Batch diselesaikan tanpa ada selisih (sempurna)!");
+                        alert("✅ Batch diselesaikan sempurna tanpa selisih!");
                     }
                     
+                    window.scrollTo(0, 0);
                     this.currentView = 'batch';
                 }
             }
