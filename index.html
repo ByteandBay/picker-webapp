@@ -19,31 +19,32 @@
         .bottom-sheet { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .sheet-hidden { transform: translateY(100%); }
         .sheet-visible { transform: translateY(0); }
+        /* Efek klik kartu & dimmed item */
+        .clickable-card { transition: all 0.2s ease; cursor: pointer; }
+        .clickable-card:active { transform: scale(0.98); }
+        .item-card { transition: all 0.3s ease; }
+        .dimmed { opacity: 0.4; filter: grayscale(80%); }
     </style>
 </head>
 <body class="text-gray-900 bg-white">
-    <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden shadow-2xl">
+    <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden shadow-2xl bg-gray-50">
         
         <!-- ========================================== -->
         <!-- 1. HALAMAN SPLASH SCREEN (MENU UTAMA)      -->
         <!-- ========================================== -->
-        <div v-if="currentView === 'splash'" class="flex flex-col items-center justify-center min-h-screen p-6 text-center relative z-10">
-            <!-- Tipografi Welcome -->
+        <div v-if="currentView === 'splash'" class="flex flex-col items-center justify-center min-h-screen p-6 text-center relative z-10 bg-white">
             <h1 class="font-marker text-4xl leading-tight mb-2 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">
                 WELLCOME<br><span class="text-black">TO</span><br>PORTAL<br>PICKER
             </h1>
             
-            <!-- Animasi Lottie Api Berkobar -->
             <div class="my-4">
                 <lottie-player src="https://assets3.lottiefiles.com/packages/lf20_q7uarxsb.json" background="transparent" speed="1.5" style="width: 250px; height: 250px;" loop autoplay></lottie-player>
             </div>
 
-            <!-- Tipografi Semangat (Elegan & Bersemangat) -->
             <h2 class="font-marker text-3xl text-black drop-shadow-md mb-10 leading-snug">
                 SEMANGAT KERJA !!!<br>AND<br>LETS THRIVING
             </h2>
 
-            <!-- Tombol Retro 8-bit Menu -->
             <button @click="menuOpen = true" class="font-pixel text-xl text-purple-900 bg-gradient-to-r from-yellow-400 via-yellow-300 to-pink-400 px-8 py-4 rounded-full border-4 border-pink-500 shadow-[0_8px_0_rgb(236,72,153)] hover:shadow-[0_4px_0_rgb(236,72,153)] hover:translate-y-1 transition-all active:shadow-none active:translate-y-2">
                 MENU
             </button>
@@ -58,15 +59,12 @@
              
         <div class="bottom-sheet absolute bottom-0 left-0 right-0 bg-[#d4e157] rounded-t-3xl p-8 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.3)]"
              :class="menuOpen ? 'sheet-visible' : 'sheet-hidden'">
-            <!-- Garis Indikator Swipe -->
             <div class="w-16 h-1.5 bg-black/20 rounded-full mx-auto mb-8"></div>
             
             <div class="space-y-6 flex flex-col items-center">
-                <!-- Tombol List Rute -->
                 <button @click="openView('rute')" class="w-full max-w-[250px] border-y-4 border-red-600 py-3 text-red-600 font-bold text-3xl font-serif tracking-wide hover:bg-black/5 transition-colors">
                     List Rute
                 </button>
-                <!-- Tombol Batch Picking -->
                 <button @click="openView('batch')" class="w-full max-w-[250px] border-y-4 border-red-600 py-3 text-red-600 font-bold text-3xl font-serif tracking-wide hover:bg-black/5 transition-colors">
                     Batch Picking
                 </button>
@@ -75,16 +73,16 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- 2. HALAMAN LIST RUTE & BATCH PICKING       -->
+        <!-- 2. HALAMAN LIST RUTE & BATCH SUMMARY       -->
         <!-- ========================================== -->
-        <div v-if="currentView !== 'splash'" class="min-h-screen bg-gray-50 pb-20 relative z-20">
+        <div v-if="currentView === 'rute' || currentView === 'batch'" class="min-h-screen pb-20 relative z-20">
             <!-- Header Navigasi -->
             <div class="bg-slate-900 text-white p-4 sticky top-0 z-30 shadow-md flex items-center justify-between">
                 <button @click="currentView = 'splash'" class="bg-slate-800 p-2 rounded-lg text-sm font-bold flex items-center gap-1 hover:bg-slate-700">
                     ⬅ Kembali
                 </button>
                 <h2 class="font-bold text-lg">
-                    {{ currentView === 'rute' ? 'Daftar Rute Shift' : 'Review Batch Picking' }}
+                    {{ currentView === 'rute' ? 'Daftar Rute Shift' : 'Pilih Batch' }}
                 </h2>
                 <button @click="fetchData(currentView)" class="bg-emerald-600 p-2 rounded-lg text-sm font-bold hover:bg-emerald-500">
                     🔄
@@ -99,7 +97,7 @@
 
             <div v-if="!loading" class="p-4 space-y-4">
                 
-                <!-- TAMPILAN: LIST RUTE (Tabel Modern per Shift) -->
+                <!-- TAMPILAN: LIST RUTE -->
                 <div v-if="currentView === 'rute'">
                     <div v-for="(cabangList, shiftName) in groupedRoutes" :key="shiftName" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-5">
                         <div class="bg-[#d4e157] px-4 py-3 border-b border-gray-200">
@@ -114,55 +112,133 @@
                     </div>
                 </div>
 
-                <!-- TAMPILAN: BATCH PICKING (Batch Summary Cards) -->
+                <!-- TAMPILAN: BATCH SUMMARY (Kartu bisa diklik) -->
                 <div v-if="currentView === 'batch'">
-                    <div v-for="(batch, index) in rawData" :key="index" class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mb-5">
+                    <div v-for="(batch, index) in rawData" :key="index" @click="goToPicking(batch)" class="clickable-card bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden mb-5 hover:shadow-lg">
                         <!-- Header Kartu -->
                         <div class="bg-slate-900 text-white px-5 py-4 flex justify-between items-center">
                             <h3 class="font-black text-xl">BATCH {{ batch['Batch'] }}</h3>
-                            <span class="text-xs font-semibold bg-slate-700 px-3 py-1 rounded-full">{{ batch['Shift'] }}</span>
+                            <span class="text-[10px] font-semibold bg-slate-700 px-2 py-1 rounded-full text-right leading-tight max-w-[140px]">{{ batch['Shift'] }}</span>
                         </div>
                         
-                        <!-- Grid Toko (Color-Coded) -->
+                        <!-- Grid Toko -->
                         <div class="p-4 grid grid-cols-2 gap-3">
-                            <div v-if="batch['Toko 1 (merah)'] !== '-'" class="bg-red-50 border border-red-200 rounded-lg p-3">
-                                <p class="text-[10px] font-bold text-red-600 mb-1">TOKO 1</p>
+                            <div v-if="batch['Toko 1 (merah)'] !== '-'" class="bg-red-50 border border-red-200 rounded-lg p-2 text-center">
+                                <p class="text-[9px] font-bold text-red-600 mb-1">TOKO 1</p>
                                 <p class="text-xs font-semibold text-red-900 leading-tight">{{ batch['Toko 1 (merah)'] }}</p>
                             </div>
-                            <div v-if="batch['Toko 2 (hijau)'] !== '-'" class="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-                                <p class="text-[10px] font-bold text-emerald-600 mb-1">TOKO 2</p>
+                            <div v-if="batch['Toko 2 (hijau)'] !== '-'" class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-center">
+                                <p class="text-[9px] font-bold text-emerald-600 mb-1">TOKO 2</p>
                                 <p class="text-xs font-semibold text-emerald-900 leading-tight">{{ batch['Toko 2 (hijau)'] }}</p>
                             </div>
-                            <div v-if="batch['Toko 3 (kuning)'] !== '-'" class="bg-yellow-50 border border-yellow-300 rounded-lg p-3">
-                                <p class="text-[10px] font-bold text-yellow-700 mb-1">TOKO 3</p>
+                            <div v-if="batch['Toko 3 (kuning)'] !== '-'" class="bg-yellow-50 border border-yellow-300 rounded-lg p-2 text-center">
+                                <p class="text-[9px] font-bold text-yellow-700 mb-1">TOKO 3</p>
                                 <p class="text-xs font-semibold text-yellow-900 leading-tight">{{ batch['Toko 3 (kuning)'] }}</p>
                             </div>
-                            <div v-if="batch['Toko 4 (biru)'] !== '-'" class="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                                <p class="text-[10px] font-bold text-blue-600 mb-1">TOKO 4</p>
+                            <div v-if="batch['Toko 4 (biru)'] !== '-'" class="bg-blue-50 border border-blue-200 rounded-lg p-2 text-center">
+                                <p class="text-[9px] font-bold text-blue-600 mb-1">TOKO 4</p>
                                 <p class="text-xs font-semibold text-blue-900 leading-tight">{{ batch['Toko 4 (biru)'] }}</p>
                             </div>
                         </div>
 
-                        <!-- Footer Statistik SKU -->
-                        <div class="bg-gray-50 p-4 border-t border-gray-100 flex justify-between text-center divide-x divide-gray-200">
-                            <div class="w-1/3">
-                                <p class="text-[10px] text-gray-500 font-bold uppercase">Identik</p>
-                                <p class="text-sm font-black text-gray-800">{{ batch['Identik (4 Item)'] }}</p>
-                            </div>
-                            <div class="w-1/3">
-                                <p class="text-[10px] text-gray-500 font-bold uppercase">Semi (2/3)</p>
-                                <p class="text-sm font-black text-gray-800">{{ isNaN(parseInt(batch['Multi (3 Item)'])) ? 0 : parseInt(batch['Multi (3 Item)']) + parseInt(batch['Semi (2 Item)']) }}</p>
-                            </div>
-                            <div class="w-1/3">
-                                <p class="text-[10px] text-gray-500 font-bold uppercase">Total SKU</p>
-                                <p class="text-lg font-black text-emerald-600">{{ batch['Total SKU'] }}</p>
-                            </div>
+                        <!-- Footer Bantuan Klik -->
+                        <div class="bg-emerald-50 p-3 text-center border-t border-emerald-100">
+                            <span class="text-emerald-700 font-bold text-sm flex justify-center items-center gap-1">
+                                📦 Mulai Ambil Barang ({{ batch['Total SKU'] }} SKU) <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </span>
                         </div>
                     </div>
                 </div>
 
             </div>
         </div>
+
+        <!-- ========================================== -->
+        <!-- 3. HALAMAN PICKING BARANG (DETAIL CEKLIS)  -->
+        <!-- ========================================== -->
+        <div v-if="currentView === 'picking'" class="min-h-screen pb-20 relative z-20">
+            <!-- Header Navigasi -->
+            <div class="bg-slate-900 text-white p-4 sticky top-0 z-30 shadow-md">
+                <div class="flex items-center justify-between mb-3">
+                    <button @click="currentView = 'batch'" class="bg-slate-800 p-2 rounded-lg text-sm font-bold flex items-center gap-1 hover:bg-slate-700">
+                        ⬅ Batal
+                    </button>
+                    <div class="text-right">
+                        <h2 class="font-bold text-lg leading-tight">Batch {{ selectedBatchData['Batch'] }}</h2>
+                        <p class="text-[10px] text-slate-300 truncate max-w-[150px]">{{ selectedBatchData['Shift'] }}</p>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div v-if="!loading && pickingData.length > 0">
+                    <div class="flex justify-between text-xs text-slate-300 mb-1">
+                        <span>Progres Pengambilan:</span>
+                        <span>{{ pickedCount }} / {{ pickingData.length }} Item ({{ progressPercent }}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-700 rounded-full h-2">
+                        <div class="bg-[#d4e157] h-2 rounded-full transition-all duration-500" :style="`width: ${progressPercent}%`"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pesan Loading -->
+            <div v-if="loading" class="flex flex-col items-center justify-center pt-20">
+                <div class="animate-spin w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full mb-3"></div>
+                <p class="text-gray-500 font-medium">Membuka daftar barang...</p>
+            </div>
+
+            <div v-if="!loading" class="p-4 space-y-3">
+                <!-- Daftar Barang (Item Cards) -->
+                <div v-for="(item, index) in pickingData" :key="index" 
+                     class="item-card bg-white rounded-xl shadow-sm border border-gray-100 flex overflow-hidden"
+                     :class="{ 'dimmed': isPicked(item['Nama Barang']) }">
+                    
+                    <!-- Kiri: Info Barang -->
+                    <div class="p-3 flex-1">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">{{ item['Kategori'] }}</span>
+                            <span class="bg-slate-800 text-white text-[11px] font-bold px-2 py-0.5 rounded">TOTAL: {{ item['Total Item'] }}</span>
+                        </div>
+                        <h2 class="text-sm font-bold text-gray-800 leading-snug mb-3">
+                            {{ item['Nama Barang'] }}
+                        </h2>
+                        
+                        <!-- Grid Kuantitas Toko -->
+                        <div class="flex flex-wrap gap-2">
+                            <div v-if="item['Toko 1 (merah)'] > 0" class="bg-red-50 text-red-700 border border-red-200 rounded px-2 py-1 flex flex-col items-center justify-center min-w-[36px]">
+                                <span class="text-[9px] font-bold">T-1</span>
+                                <span class="text-sm font-black">{{ item['Toko 1 (merah)'] }}</span>
+                            </div>
+                            <div v-if="item['Toko 2 (hijau)'] > 0" class="bg-emerald-50 text-emerald-700 border border-emerald-200 rounded px-2 py-1 flex flex-col items-center justify-center min-w-[36px]">
+                                <span class="text-[9px] font-bold">T-2</span>
+                                <span class="text-sm font-black">{{ item['Toko 2 (hijau)'] }}</span>
+                            </div>
+                            <div v-if="item['Toko 3 (kuning)'] > 0" class="bg-yellow-50 text-yellow-700 border border-yellow-200 rounded px-2 py-1 flex flex-col items-center justify-center min-w-[36px]">
+                                <span class="text-[9px] font-bold">T-3</span>
+                                <span class="text-sm font-black">{{ item['Toko 3 (kuning)'] }}</span>
+                            </div>
+                            <div v-if="item['Toko 4 (biru)'] > 0" class="bg-blue-50 text-blue-700 border border-blue-200 rounded px-2 py-1 flex flex-col items-center justify-center min-w-[36px]">
+                                <span class="text-[9px] font-bold">T-4</span>
+                                <span class="text-sm font-black">{{ item['Toko 4 (biru)'] }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kanan: Tombol Action (Ceklis) -->
+                    <button @click="togglePick(item['Nama Barang'])" 
+                            class="w-20 flex flex-col items-center justify-center border-l border-gray-100 transition-colors"
+                            :class="isPicked(item['Nama Barang']) ? 'bg-gray-100 text-gray-400' : 'bg-[#d4e157] hover:bg-[#cddc39] text-slate-800'">
+                        <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span class="text-[10px] font-bold tracking-wide" v-text="isPicked(item['Nama Barang']) ? 'SELESAI' : 'AMBIL'"></span>
+                    </button>
+                </div>
+                
+                <div v-if="pickingData.length === 0" class="text-center py-10 text-gray-400 font-medium">
+                    Tidak ada barang ditemukan di batch ini.
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -171,16 +247,18 @@
         createApp({
             data() {
                 return {
-                    // API URL - Terhubung ke URL Google Apps Script Anda
                     apiUrl: 'https://script.google.com/macros/s/AKfycbw-Hlly2gks4HjfRIdD0xL3l7Uhc7I-R2dRaGWYgFMY7qkhRWOYLcSQuEuqHCMLnnsL/exec',
-                    currentView: 'splash', // splash, rute, batch
+                    currentView: 'splash', // splash, rute, batch, picking
                     menuOpen: false,
                     loading: false,
-                    rawData: []
+                    rawData: [],
+                    // State untuk Picking
+                    selectedBatchData: null,
+                    pickingData: [],
+                    pickedItems: [] 
                 }
             },
             computed: {
-                // Mengelompokkan data rute berdasarkan Shift
                 groupedRoutes() {
                     if (this.currentView !== 'rute') return {};
                     const groups = {};
@@ -193,6 +271,13 @@
                         }
                     });
                     return groups;
+                },
+                pickedCount() {
+                    return this.pickingData.filter(item => this.isPicked(item['Nama Barang'])).length;
+                },
+                progressPercent() {
+                    if (this.pickingData.length === 0) return 0;
+                    return Math.round((this.pickedCount / this.pickingData.length) * 100);
                 }
             },
             methods: {
@@ -205,7 +290,6 @@
                     this.loading = true;
                     this.rawData = [];
                     try {
-                        // Menambahkan parameter ?action= rute / batch ke URL API
                         const response = await fetch(`${this.apiUrl}?action=${actionType}`);
                         const result = await response.json();
                         if (result.status === 'success') {
@@ -214,10 +298,49 @@
                             alert(result.message);
                         }
                     } catch (error) {
-                        alert('Gagal terhubung ke server Google. Coba muat ulang.');
+                        alert('Gagal terhubung ke server Google.');
                     } finally {
                         this.loading = false;
                     }
+                },
+                // Fungsi navigasi ke halaman Ceklis Barang
+                async goToPicking(batch) {
+                    this.selectedBatchData = batch;
+                    this.currentView = 'picking';
+                    this.loading = true;
+                    this.pickingData = [];
+                    this.pickedItems = []; // Reset ceklis saat masuk batch baru
+                    
+                    try {
+                        // Menggunakan default action untuk menarik Picker Item List
+                        const response = await fetch(`${this.apiUrl}?action=detail`);
+                        const result = await response.json();
+                        if (result.status === 'success') {
+                            // Saring (Filter) barang HANYA untuk Batch & Shift yang diklik
+                            this.pickingData = result.data.filter(item => 
+                                item['Batch'] == batch['Batch'] && 
+                                item['Shift'] == batch['Shift'] && 
+                                item['Nama Barang'] !== '[DAFTAR TOKO]'
+                            );
+                        } else {
+                            alert(result.message);
+                        }
+                    } catch (error) {
+                        alert('Gagal memuat detail barang.');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                togglePick(itemName) {
+                    const index = this.pickedItems.indexOf(itemName);
+                    if (index > -1) {
+                        this.pickedItems.splice(index, 1);
+                    } else {
+                        this.pickedItems.push(itemName);
+                    }
+                },
+                isPicked(itemName) {
+                    return this.pickedItems.includes(itemName);
                 }
             }
         }).mount('#app');
