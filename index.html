@@ -19,7 +19,8 @@
         .clickable-card { transition: all 0.2s ease; cursor: pointer; }
         .clickable-card:active { transform: scale(0.98); }
         .item-card { transition: all 0.3s ease; }
-        .dimmed { opacity: 0.4; filter: grayscale(80%); pointer-events: none; }
+        /* PERBAIKAN: Menghapus pointer-events: none agar kartu tetap bisa diklik untuk batal */
+        .dimmed { opacity: 0.5; filter: grayscale(80%); } 
         
         /* Animasi Running Light VAPEBOSS */
         .neon-marquee-container {
@@ -230,7 +231,7 @@
                         <!-- Tombol Ambil -->
                         <button @click="togglePick(item['Nama Barang'])" class="w-20 flex flex-col items-center justify-center transition-colors" :class="isPicked(item['Nama Barang']) ? 'bg-gray-100 text-gray-400' : 'bg-[#d4e157] hover:bg-[#cddc39] text-slate-800'">
                             <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            <span class="text-[10px] font-bold tracking-wide" v-text="isPicked(item['Nama Barang']) ? 'SELESAI' : 'AMBIL'"></span>
+                            <span class="text-[10px] font-bold tracking-wide" v-text="isPicked(item['Nama Barang']) ? 'BATAL' : 'AMBIL'"></span>
                         </button>
                     </div>
 
@@ -361,10 +362,8 @@
                 isPicked(itemName) {
                     return this.pickedItems.includes(itemName);
                 },
-                // FUNGSI MENGIRIM LAPORAN KE SPREADSHEET
                 async submitBatch() {
                     let discrepancies = [];
-                    // Deteksi jika ada perubahan kuantitas
                     this.pickingData.forEach(item => {
                         const stores = [
                             { nama: this.selectedBatchData['Toko 1 (merah)'], qtyAsli: parseInt(item['Toko 1 (merah)']) || 0, qtyBaru: item.qtyT1 },
@@ -392,7 +391,6 @@
                     if (discrepancies.length > 0) {
                         this.loading = true;
                         try {
-                            // Kirim sebagai teks agar tidak ditolak sistem keamanan (CORS) Google
                             await fetch(this.apiUrl, {
                                 method: 'POST',
                                 body: JSON.stringify({ reports: discrepancies }),
@@ -407,7 +405,6 @@
                         alert("✅ Batch diselesaikan tanpa ada selisih (sempurna)!");
                     }
                     
-                    // Kembali ke menu daftar batch
                     this.currentView = 'batch';
                 }
             }
