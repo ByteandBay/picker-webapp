@@ -376,18 +376,34 @@
                             <th class="w-1/6">Kategori</th>
                             <th class="w-1/6">Kode Barang</th>
                             <th class="w-2/6">Nama Barang</th>
-                            <th class="w-1/12 text-center bg-blue-100">Kuantitas</th>
+                            <th class="w-1/12 text-center bg-blue-100">Target / Sisa</th>
                             <th class="w-1/12 text-center bg-yellow-100">Fisik</th>
-                            <th class="w-1/12 text-center bg-gray-100">Selisih</th>
+                            <th class="w-1/12 text-center bg-gray-100">Selisih / Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
+                   <tbody>
                         <tr v-for="item in sortedCheckerItems" :key="item['Kode Barang']" :class="getRowColor(item)">
                             <td>{{ item['Kategori'] }}</td>
                             <td class="font-mono text-sm">{{ item['Kode Barang'] }}</td>
                             <td>{{ item['Nama Barang'] }}</td>
-                            <td class="text-center text-xl font-black bg-white/40">{{ item['Kuantitas'] || 0 }}</td>
-                            <td class="text-center text-xl font-black bg-white/60">{{ item['Fisik'] }}</td>
+                            <!-- Kolom Target dikurangi Fisik secara real-time -->
+                            <td class="text-center text-xl font-black bg-white/40">
+                                <span :class="(item['Kuantitas'] || 0) - item['Fisik'] < 0 ? 'text-red-600' : 'text-blue-900'">
+                                    {{ (item['Kuantitas'] || 0) - item['Fisik'] }}
+                                </span>
+                            </td>
+                            <!-- Kolom Fisik dengan Fitur Edit Cepat (+ / -) -->
+                            <td class="text-center bg-white/60">
+                                <div v-if="!item.editMode" @click="item.editMode = true" class="text-xl font-black cursor-pointer hover:bg-yellow-200 py-1 rounded transition" title="Klik untuk edit fisik">
+                                    {{ item['Fisik'] }} ✏️
+                                </div>
+                                <div v-else class="flex items-center justify-center gap-1">
+                                    <button @click="item['Fisik'] > 0 ? item['Fisik']-- : null" class="bg-red-300 px-2 py-0.5 rounded font-bold">-</button>
+                                    <span class="text-lg font-black px-1">{{ item['Fisik'] }}</span>
+                                    <button @click="item['Fisik']++" class="bg-emerald-300 px-2 py-0.5 rounded font-bold">+</button>
+                                    <button @click="item.editMode = false" class="bg-slate-800 text-white px-2 py-0.5 rounded text-xs ml-1">OK</button>
+                                </div>
+                            </td>
                             <td class="text-center text-xl font-black bg-white/40">
                                 <span :class="item['Fisik'] - (item['Kuantitas'] || 0) < 0 ? 'text-red-600' : (item['Fisik'] - (item['Kuantitas'] || 0) > 0 ? 'text-purple-700' : 'text-emerald-700')">
                                     {{ item['Fisik'] - (item['Kuantitas'] || 0) }}
@@ -402,10 +418,51 @@
                 </div>
             </div>
             
-            <div v-if="currentView === 'checker' && !loading" class="bg-gray-100 p-4 border-t-2 border-gray-300 flex justify-end">
-                <button class="bg-blue-800 text-white px-8 py-3 rounded-lg font-black shadow-lg hover:bg-blue-700 hover:-translate-y-1 transition-all">
+           <div v-if="currentView === 'checker' && !loading" class="bg-gray-100 p-4 border-t-2 border-gray-300 flex justify-between items-center">
+                <button @click="showRekapModal = true" class="bg-amber-600 text-white px-6 py-3 rounded-lg font-black shadow-lg hover:bg-amber-500 transition-all">
+                    📊 Lihat Rekap Item Selisih
+                </button>
+                <button @click="submitCheckerData" class="bg-blue-800 text-white px-8 py-3 rounded-lg font-black shadow-lg hover:bg-blue-700 transition-all">
                     💾 SIMPAN HASIL CHECKER
                 </button>
+            </div>
+
+            <!-- MODAL POPUP REKAP SELISIH -->
+            <div v-if="showRekapModal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-6">
+                <div class="bg-white w-full max-w-3xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+                    <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
+                        <h3 class="font-black text-lg">REKAP ITEM SELISIH (FISIK vs TARGET)</h3>
+                        <button @click="showRekapModal = false" class="text-red-400 font-black text-xl hover:text-white">✕</button>
+                    </div>
+                    <div class="p-6 overflow-y-auto flex-1">
+                        <table class="w-full checker-table">
+                            <thead>
+                                <tr>
+                                    <th>Nama Barang</th>
+                                    <th class="text-center">Target</th>
+                                    <th class="text-center">Fisik</th>
+                                    <th class="text-center">Status Selisih</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="item in rekapSelisihList" :key="item['Kode Barang']">
+                                    <td>{{ item['Nama Barang'] }}</td>
+                                    <td class="text-center font-bold">{{ item['Kuantitas'] || 0 }}</td>
+                                    <td class="text-center font-bold">{{ item['Fisik'] }}</td>
+                                    <td class="text-center font-black" :class="item['Fisik'] - (item['Kuantitas'] || 0) < 0 ? 'text-red-600' : 'text-purple-700'">
+                                        {{ item['Fisik'] - (item['Kuantitas'] || 0) > 0 ? '+' + (item['Fisik'] - (item['Kuantitas'] || 0)) : item['Fisik'] - (item['Kuantitas'] || 0) }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div v-if="rekapSelisihList.length === 0" class="text-center py-8 text-gray-500 font-bold">
+                            ✅ Luar biasa! Tidak ada item yang selisih (Semua Pas).
+                        </div>
+                    </div>
+                    <div class="bg-gray-100 p-4 text-right">
+                        <button @click="showRekapModal = false" class="bg-slate-800 text-white px-6 py-2 rounded font-bold">Tutup</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -430,6 +487,7 @@
                     currentView: 'splash',
                     menuOpen: false,
                     loading: false,
+                    showRekapModal: false
                     
                     // Picker Data
                     rawData: [],
@@ -477,6 +535,10 @@
                         if (shift && cabang) {
                             if (!groups[shift]) groups[shift] = [];
                             groups[shift].push(cabang);
+                rekapSelisihList() {
+        if (!this.checkerForm.cabang || !this.checkerForm.noIt) return [];
+        let data = this.checkerItems.filter(i => i['Gudang Tujuan/Dari'] === this.checkerForm.cabang && i['No. Pemindahan #'] === this.checkerForm.noIt);
+        return data.filter(i => i['Fisik'] !== (i['Kuantitas'] || 0));
                         }
                     });
                     return groups;
@@ -536,20 +598,22 @@
                 },
 
                 // Tabel Filtered & Sorted
-                sortedCheckerItems() {
+               sortedCheckerItems() {
                     let data = this.checkerItems;
-                    
-                    // Wajib Pilih Gudang & No IT dulu agar tabel tidak kepanjangan
                     if (!this.checkerForm.cabang || !this.checkerForm.noIt) return [];
 
-                    // Filter by Master Dropdown
                     data = data.filter(i => i['Gudang Tujuan/Dari'] === this.checkerForm.cabang && i['No. Pemindahan #'] === this.checkerForm.noIt);
                     
-                    // Filter Tambahan UI
                     if (this.checkerFilter.kategori !== 'Semua Kategori') { data = data.filter(i => i['Kategori'] === this.checkerFilter.kategori); }
-                    if (this.checkerFilter.status === 'Kurang') { data = data.filter(i => i['Fisik'] < (i['Kuantitas'] || 0)); } 
-                    else if (this.checkerFilter.status === 'Pas') { data = data.filter(i => i['Fisik'] === (i['Kuantitas'] || 0) && i['Kuantitas'] > 0); } 
-                    else if (this.checkerFilter.status === 'Berlebih') { data = data.filter(i => i['Fisik'] > (i['Kuantitas'] || 0)); }
+                    
+                    // Filter Status yang Presisi
+                    if (this.checkerFilter.status === 'Kurang') { 
+                        data = data.filter(i => i['Fisik'] < (i['Kuantitas'] || 0)); 
+                    } else if (this.checkerFilter.status === 'Pas') { 
+                        data = data.filter(i => i['Fisik'] === (i['Kuantitas'] || 0)); 
+                    } else if (this.checkerFilter.status === 'Berlebih') { 
+                        data = data.filter(i => i['Fisik'] > (i['Kuantitas'] || 0)); 
+                    }
                     
                     return data.sort((a, b) => {
                         const aSelesai = a['Fisik'] === (a['Kuantitas'] || 0) && a['Kuantitas'] > 0;
