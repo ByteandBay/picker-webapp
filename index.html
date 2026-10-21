@@ -257,7 +257,7 @@
                 </button>
             </div>
 
-            <!-- HEADER ADMINISTRATIF (INPUT DENGAN AUTO-SUGGEST/DATALIST) -->
+            <!-- HEADER ADMINISTRATIF (DENGAN CUSTOM SEARCHABLE DROPDOWN) -->
             <div class="p-6 border-b border-gray-200 bg-gray-50 grid grid-cols-3 gap-6">
                 <!-- Baris Khusus Tombol Lock -->
                 <div class="col-span-3 flex justify-between items-center bg-gray-200 px-4 py-2 rounded-lg border border-gray-300">
@@ -270,24 +270,54 @@
                     </button>
                 </div>
 
-                <div class="flex flex-col">
+                <!-- GUDANG TUJUAN (CUSTOM DROPDOWN) -->
+                <div class="flex flex-col relative">
                     <label class="text-xs font-bold text-gray-500 mb-1">Gudang Tujuan/Dari</label>
-                    <input type="text" list="gudang-list" v-model="checkerForm.cabang" :disabled="isCheckerLocked" @change="checkerForm.noIt = ''" 
-                           placeholder="Ketik / Pilih Gudang..."
-                           class="border-2 border-gray-300 p-3 rounded font-bold focus:border-blue-500 outline-none uppercase disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
-                    <datalist id="gudang-list">
-                        <option v-for="gudang in dynamicGudangList" :key="gudang" :value="gudang"></option>
-                    </datalist>
+                    <div class="relative">
+                        <input ref="gudangInput" type="text" v-model="checkerForm.cabang" :disabled="isCheckerLocked" 
+                               @focus="showGudangList = true; $event.target.select()"
+                               @blur="showGudangList = false"
+                               placeholder="Ketik / Pilih Gudang..." 
+                               class="w-full border-2 border-gray-300 p-3 pr-10 rounded font-bold focus:border-blue-500 outline-none uppercase disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
+                        <button v-if="checkerForm.cabang && !isCheckerLocked" @click="checkerForm.cabang = ''; checkerForm.noIt = ''; showGudangList = true; $nextTick(() => $refs.gudangInput.focus())" 
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 hover:text-red-700 font-black text-xl z-10">✖</button>
+                    </div>
+                    <div v-if="showGudangList && !isCheckerLocked" class="absolute top-[100%] left-0 right-0 bg-white border-2 border-blue-400 mt-1 rounded shadow-xl z-50 max-h-60 overflow-y-auto">
+                        <div v-for="gudang in dynamicGudangList.filter(g => g.toLowerCase().includes(checkerForm.cabang.toLowerCase()))" :key="gudang"
+                             @mousedown.prevent="checkerForm.cabang = gudang; checkerForm.noIt = ''; showGudangList = false"
+                             class="p-3 border-b border-gray-100 hover:bg-blue-100 cursor-pointer font-bold text-sm uppercase">
+                            {{ gudang }}
+                        </div>
+                        <div v-if="dynamicGudangList.filter(g => g.toLowerCase().includes(checkerForm.cabang.toLowerCase())).length === 0" class="p-3 text-gray-500 text-sm font-bold text-center">
+                            Gudang tidak ditemukan
+                        </div>
+                    </div>
                 </div>
-                <div class="flex flex-col">
+
+                <!-- NO PEMINDAHAN (CUSTOM DROPDOWN) -->
+                <div class="flex flex-col relative">
                     <label class="text-xs font-bold text-gray-500 mb-1">No. Pemindahan #</label>
-                    <input type="text" list="noit-list" v-model="checkerForm.noIt" :disabled="isCheckerLocked || !checkerForm.cabang" 
-                           placeholder="Ketik / Pilih No. Pemindahan..."
-                           class="border-2 border-gray-300 p-3 rounded font-bold focus:border-blue-500 outline-none uppercase disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
-                    <datalist id="noit-list">
-                        <option v-for="no in dynamicNoItList" :key="no" :value="no"></option>
-                    </datalist>
+                    <div class="relative">
+                        <input ref="noItInput" type="text" v-model="checkerForm.noIt" :disabled="isCheckerLocked || !checkerForm.cabang" 
+                               @focus="showNoItList = true; $event.target.select()"
+                               @blur="showNoItList = false"
+                               placeholder="Ketik / Pilih No..." 
+                               class="w-full border-2 border-gray-300 p-3 pr-10 rounded font-bold focus:border-blue-500 outline-none uppercase disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
+                        <button v-if="checkerForm.noIt && !isCheckerLocked" @click="checkerForm.noIt = ''; showNoItList = true; $nextTick(() => $refs.noItInput.focus())" 
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 hover:text-red-700 font-black text-xl z-10">✖</button>
+                    </div>
+                    <div v-if="showNoItList && !isCheckerLocked" class="absolute top-[100%] left-0 right-0 bg-white border-2 border-blue-400 mt-1 rounded shadow-xl z-50 max-h-60 overflow-y-auto">
+                        <div v-for="no in dynamicNoItList.filter(n => n.toLowerCase().includes(checkerForm.noIt.toLowerCase()))" :key="no"
+                             @mousedown.prevent="checkerForm.noIt = no; showNoItList = false"
+                             class="p-3 border-b border-gray-100 hover:bg-blue-100 cursor-pointer font-bold text-sm uppercase">
+                            {{ no }}
+                        </div>
+                        <div v-if="dynamicNoItList.filter(n => n.toLowerCase().includes(checkerForm.noIt.toLowerCase())).length === 0" class="p-3 text-gray-500 text-sm font-bold text-center">
+                            No. IT tidak ditemukan
+                        </div>
+                    </div>
                 </div>
+
                 <div class="flex flex-col">
                     <label class="text-xs font-bold text-gray-500 mb-1">PIC Checker</label>
                     <input type="text" v-model="checkerForm.pic" :disabled="isCheckerLocked" placeholder="Nama Anda..." 
@@ -419,7 +449,11 @@
                     
                     checkerFilter: { kategori: 'Semua Kategori', status: 'Semua' },
                     currentScan: '',
-                    currentScanQty: 1
+                    currentScanQty: 1,
+                    
+                    // Dropdown UI State
+                    showGudangList: false,
+                    showNoItList: false
                 }
             },
             watch: {
@@ -495,7 +529,7 @@
                     return Array.from(cats).filter(c => c && c.toString().trim() !== '');
                 },
                 
-                // AUTO-SUGGEST DATALIST (Menampilkan saran barang sesuai yang ada di tabel saat ini)
+                // AUTO-SUGGEST DATALIST ITEM
                 itemSuggestionsList() {
                     const names = this.sortedCheckerItems.map(i => i['Nama Barang']);
                     return Array.from(new Set(names));
@@ -681,7 +715,6 @@
                 },
 
                 handleScan() {
-                    // Mencegah scan jika gudang dan no pemindahan belum dipilih
                     if(!this.checkerForm.cabang || !this.checkerForm.noIt) {
                         this.playSound('error');
                         alert("⚠️ PILIH GUDANG & NO. PEMINDAHAN TERLEBIH DAHULU!");
@@ -692,7 +725,6 @@
                     const scanStr = this.currentScan.trim().toLowerCase();
                     if (!scanStr) return;
                     
-                    // Mencari barang HANYA pada daftar yang sedang aktif di tabel
                     const foundItem = this.sortedCheckerItems.find(i => 
                         (i['Kode Barang'] && i['Kode Barang'].toString().toLowerCase() === scanStr) || 
                         (i['Nama Barang'] && i['Nama Barang'].toString().toLowerCase() === scanStr)
