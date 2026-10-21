@@ -279,14 +279,14 @@
                 </div>
 
                 <div class="flex flex-col">
-                    <label class="text-xs font-bold text-gray-500 mb-1">Cabang Target (Pilih / Ketik)</label>
-                    <input type="text" list="history-cabang" v-model="checkerForm.cabang" :disabled="isCheckerLocked" placeholder="Ketik Cabang..." 
+                    <label class="text-xs font-bold text-gray-500 mb-1">Gudang Tujuan/Dari</label>
+                    <input type="text" list="history-cabang" v-model="checkerForm.cabang" :disabled="isCheckerLocked" placeholder="Ketik Gudang..." 
                            class="border-2 border-gray-300 p-3 rounded font-bold focus:border-blue-500 outline-none uppercase disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
                     <datalist id="history-cabang"><option v-for="c in cabangHistory" :key="c" :value="c"></option></datalist>
                 </div>
                 <div class="flex flex-col">
-                    <label class="text-xs font-bold text-gray-500 mb-1">No IT (Pilih / Ketik)</label>
-                    <input type="text" list="history-noit" v-model="checkerForm.noIt" :disabled="isCheckerLocked" placeholder="Ketik No IT..." 
+                    <label class="text-xs font-bold text-gray-500 mb-1">No. Pemindahan #</label>
+                    <input type="text" list="history-noit" v-model="checkerForm.noIt" :disabled="isCheckerLocked" placeholder="Ketik No. Pemindahan..." 
                            class="border-2 border-gray-300 p-3 rounded font-bold focus:border-blue-500 outline-none uppercase disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
                     <datalist id="history-noit"><option v-for="n in noItHistory" :key="n" :value="n"></option></datalist>
                 </div>
