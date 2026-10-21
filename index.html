@@ -250,14 +250,14 @@
             <div class="bg-blue-800 text-white p-4 shadow-md flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <button @click="currentView = 'splash'" class="bg-blue-900 px-4 py-2 rounded font-bold hover:bg-blue-700 transition">⬅ Menu Utama</button>
-                    <h2 class="font-black text-xl tracking-wide">PORTAL CHECKER 💻</h2>
+                    <h2 class="font-black text-xl tracking-wide">PORTAL CHECKER</h2>
                 </div>
                 <button @click="fetchCheckerData" class="bg-emerald-500 px-4 py-2 rounded font-bold hover:bg-emerald-400 text-slate-900 flex items-center gap-2 shadow-sm">
                     <span>🔄 Tarik Master Data Barcode</span>
                 </button>
             </div>
 
-            <!-- HEADER ADMINISTRATIF (DENGAN CASCADING DROPDOWN) -->
+            <!-- HEADER ADMINISTRATIF (INPUT DENGAN AUTO-SUGGEST/DATALIST) -->
             <div class="p-6 border-b border-gray-200 bg-gray-50 grid grid-cols-3 gap-6">
                 <!-- Baris Khusus Tombol Lock -->
                 <div class="col-span-3 flex justify-between items-center bg-gray-200 px-4 py-2 rounded-lg border border-gray-300">
@@ -265,26 +265,28 @@
                     <button @click="isCheckerLocked = !isCheckerLocked" 
                             class="px-5 py-2 rounded-md font-bold text-sm shadow-sm transition-all flex items-center gap-2"
                             :class="isCheckerLocked ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'bg-amber-500 text-white hover:bg-amber-600'">
-                        <span v-if="isCheckerLocked">🔒 INFO TERKUNCI (Klik untuk Edit)</span>
-                        <span v-else>🔓 KUNCI INFO (Simpan & Tampilkan Data)</span>
+                        <span v-if="isCheckerLocked">INFO TERKUNCI (Klik untuk Edit)</span>
+                        <span v-else>KUNCI INFO (Simpan & Tampilkan Data)</span>
                     </button>
                 </div>
 
                 <div class="flex flex-col">
                     <label class="text-xs font-bold text-gray-500 mb-1">Gudang Tujuan/Dari</label>
-                    <select v-model="checkerForm.cabang" :disabled="isCheckerLocked" @change="checkerForm.noIt = ''" 
+                    <input type="text" list="gudang-list" v-model="checkerForm.cabang" :disabled="isCheckerLocked" @change="checkerForm.noIt = ''" 
+                           placeholder="Ketik / Pilih Gudang..."
                            class="border-2 border-gray-300 p-3 rounded font-bold focus:border-blue-500 outline-none uppercase disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
-                        <option value="" disabled>-- PILIH GUDANG --</option>
-                        <option v-for="gudang in dynamicGudangList" :key="gudang" :value="gudang">{{ gudang }}</option>
-                    </select>
+                    <datalist id="gudang-list">
+                        <option v-for="gudang in dynamicGudangList" :key="gudang" :value="gudang"></option>
+                    </datalist>
                 </div>
                 <div class="flex flex-col">
                     <label class="text-xs font-bold text-gray-500 mb-1">No. Pemindahan #</label>
-                    <select v-model="checkerForm.noIt" :disabled="isCheckerLocked || !checkerForm.cabang" 
+                    <input type="text" list="noit-list" v-model="checkerForm.noIt" :disabled="isCheckerLocked || !checkerForm.cabang" 
+                           placeholder="Ketik / Pilih No. Pemindahan..."
                            class="border-2 border-gray-300 p-3 rounded font-bold focus:border-blue-500 outline-none uppercase disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
-                        <option value="" disabled>-- PILIH NO. PEMINDAHAN --</option>
-                        <option v-for="no in dynamicNoItList" :key="no" :value="no">{{ no }}</option>
-                    </select>
+                    <datalist id="noit-list">
+                        <option v-for="no in dynamicNoItList" :key="no" :value="no"></option>
+                    </datalist>
                 </div>
                 <div class="flex flex-col">
                     <label class="text-xs font-bold text-gray-500 mb-1">PIC Checker</label>
@@ -310,15 +312,20 @@
                 </div>
             </div>
 
-            <!-- AREA SCAN BARCODE -->
+            <!-- AREA SCAN BARCODE & AUTO-SUGGESTION -->
             <div class="p-6 bg-blue-100 border-b border-blue-200 grid grid-cols-[3fr_1fr] gap-6 items-end">
                 <div class="flex flex-col relative">
                     <label class="text-sm font-black text-blue-900 mb-2 flex items-center gap-2">
                         <span>🔍 Scan / Input Barcode / Item Name</span>
                         <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded animate-pulse">AUTOFOCUS ON</span>
                     </label>
-                    <input ref="scanInput" type="text" v-model="currentScan" @keyup.enter="handleScan" placeholder="Tembakkan Barcode Scanner di sini..." 
+                    <input ref="scanInput" type="text" list="item-suggestions" v-model="currentScan" @keyup.enter="handleScan" placeholder="Tembakkan Barcode Scanner di sini..." 
                            class="border-4 border-blue-400 p-4 rounded-lg font-black text-xl text-blue-900 focus:border-blue-600 outline-none shadow-inner bg-white">
+                    
+                    <!-- DATALIST UNTUK AUTO-SUGGESTION ITEM -->
+                    <datalist id="item-suggestions">
+                        <option v-for="name in itemSuggestionsList" :key="name" :value="name"></option>
+                    </datalist>
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm font-black text-blue-900 mb-2">Kuantitas Ketik (Default 1)</label>
@@ -360,7 +367,7 @@
                     </tbody>
                 </table>
                 <div v-if="sortedCheckerItems.length === 0" class="text-center p-10 text-gray-400 font-bold">
-                    <p class="text-lg mb-2">Pilih <b>Gudang Tujuan/Dari</b> dan <b>No. Pemindahan</b> terlebih dahulu.</p>
+                    <p class="text-lg mb-2">Pilih/Ketik <b>Gudang Tujuan/Dari</b> dan <b>No. Pemindahan</b> terlebih dahulu.</p>
                     <p class="text-sm">Tabel akan otomatis menampilkan barang yang sesuai dengan rute tersebut.</p>
                 </div>
             </div>
@@ -463,24 +470,23 @@
                 },
                 
                 // ==========================================
-                // COMPUTED KHUSUS CHECKER (DATA DRIVEN - HARDCODED HEADER)
-                // Mengunci target tepat pada Header yang Anda sampaikan
+                // COMPUTED KHUSUS CHECKER
                 // ==========================================
                 
-                // 1. Dropdown Gudang Tujuan (Unik)
+                // Dropdown Gudang Tujuan (Unik)
                 dynamicGudangList() {
                     if (!this.checkerItems.length) return [];
                     const set = new Set(this.checkerItems.map(i => i['Gudang Tujuan/Dari']));
                     return Array.from(set).filter(c => c && c.toString().trim() !== '').sort();
                 },
-                // 2. Dropdown No Pemindahan (Cascading: Tergantung Pilihan Gudang)
+                // Dropdown No Pemindahan (Cascading: Tergantung Pilihan Gudang)
                 dynamicNoItList() {
                     if (!this.checkerItems.length || !this.checkerForm.cabang) return [];
                     const filtered = this.checkerItems.filter(i => i['Gudang Tujuan/Dari'] === this.checkerForm.cabang);
                     const set = new Set(filtered.map(i => i['No. Pemindahan #']));
                     return Array.from(set).filter(c => c && c.toString().trim() !== '').sort();
                 },
-                // 3. Dropdown Kategori (Berdasarkan saringan Gudang & No IT)
+                // Dropdown Kategori (Berdasarkan saringan Gudang & No IT)
                 checkerCategories() {
                     let data = this.checkerItems;
                     if (this.checkerForm.cabang) { data = data.filter(i => i['Gudang Tujuan/Dari'] === this.checkerForm.cabang); }
@@ -488,7 +494,14 @@
                     const cats = new Set(data.map(i => i['Kategori']));
                     return Array.from(cats).filter(c => c && c.toString().trim() !== '');
                 },
-                // 4. Tabel Filtered & Sorted
+                
+                // AUTO-SUGGEST DATALIST (Menampilkan saran barang sesuai yang ada di tabel saat ini)
+                itemSuggestionsList() {
+                    const names = this.sortedCheckerItems.map(i => i['Nama Barang']);
+                    return Array.from(new Set(names));
+                },
+
+                // Tabel Filtered & Sorted
                 sortedCheckerItems() {
                     let data = this.checkerItems;
                     
