@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Picker & Checker</title>
+    <title>Portal Picker</title>
     <!-- Vue 3 & Tailwind CSS -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Press+Start+2P&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lottie Player -->
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
@@ -40,25 +41,15 @@
         
         .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
         .fade-enter-from, .fade-leave-to { opacity: 0; }
-
-        /* CSS KHUSUS CHECKER TABLE */
-        .checker-table th { background-color: #4ade80; color: #064e3b; padding: 12px; border: 2px solid #000; text-align: left; position: sticky; top: 0; z-index: 10;}
-        .checker-table td { padding: 10px; border: 2px solid #000; font-weight: 600; }
-        .row-green { background-color: #d1fae5; }
-        .row-yellow { background-color: #fef08a; }
-        .row-red { background-color: #fecaca; color: #7f1d1d; }
-        .row-white { background-color: #ffffff; }
     </style>
 </head>
 <body class="text-gray-900">
-    <!-- SMART CONTAINER -->
-    <div id="app" class="mx-auto min-h-screen relative overflow-hidden shadow-2xl bg-slate-50 flex flex-col transition-all duration-300" 
-         :class="currentView === 'checker' ? 'w-full max-w-6xl' : 'max-w-md'">
+    <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden shadow-2xl bg-slate-50 flex flex-col">
         
         <!-- ================= SPLASH SCREEN ================= -->
         <div v-if="currentView === 'splash'" class="flex flex-col items-center justify-center flex-1 p-6 text-center relative z-10 bg-white">
             <h1 class="font-marker text-4xl leading-tight mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">
-                WELLCOME<br><span class="text-black">TO</span><br>PORTAL<br>PICKER & CHECKER
+                WELLCOME<br><span class="text-black">TO</span><br>PORTAL<br>PICKER
             </h1>
             <div class="w-full max-w-[280px] mb-8">
                 <div class="neon-marquee-container"><span class="neon-marquee font-pixel">VAPEBOSS</span></div>
@@ -69,14 +60,16 @@
             </button>
         </div>
 
-        <!-- ================= BOTTOM SHEET MENU ================= -->
+        <!-- ================= BOTTOM SHEET ================= -->
         <div class="absolute inset-0 bg-black/60 z-40 transition-opacity duration-300" :class="menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'" @click="menuOpen = false"></div>
         <div class="bottom-sheet absolute bottom-0 left-0 right-0 bg-[#d4e157] rounded-t-3xl p-8 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.3)]" :class="menuOpen ? 'sheet-visible' : 'sheet-hidden'">
             <div class="w-16 h-1.5 bg-black/20 rounded-full mx-auto mb-8"></div>
             <div class="space-y-6 flex flex-col items-center">
-                <button @click="openView('rute')" class="w-full max-w-[250px] border-y-4 border-red-600 py-3 text-red-600 font-bold text-3xl font-serif tracking-wide hover:bg-black/10 transition-colors">List Rute</button>
-                <button @click="openView('batch')" class="w-full max-w-[250px] border-y-4 border-red-600 py-3 text-red-600 font-bold text-3xl font-serif tracking-wide hover:bg-black/10 transition-colors">Batch Picking</button>
-                <button @click="openView('checker')" class="w-full max-w-[250px] border-y-4 border-red-600 py-3 text-red-600 font-bold text-3xl font-serif tracking-wide hover:bg-black/10 transition-colors">Portal Checker</button>
+                <button @click="openView('rute')" class="w-full max-w-[250px] border-y-4 border-red-600 py-3 text-red-600 font-bold text-3xl font-serif tracking-wide hover:bg-black/5 transition-colors">List Rute</button>
+                <button @click="openView('batch')" class="w-full max-w-[250px] border-y-4 border-red-600 py-3 text-red-600 font-bold text-3xl font-serif tracking-wide hover:bg-black/5 transition-colors">Batch Picking</button>
+                
+                <!-- TOMBOL JEMBATAN KE APLIKASI CHECKER -->
+                <button @click="window.location.href='https://LINK_GITHUB_CHECKER_ANDA.github.io'" class="w-full max-w-[250px] border-y-4 border-blue-600 py-3 text-blue-600 font-bold text-3xl font-serif tracking-wide hover:bg-black/5 transition-colors">Portal Checker</button>
             </div>
             <div class="pb-10"></div>
         </div>
@@ -95,6 +88,7 @@
             </div>
 
             <div v-if="!loading" class="p-3 space-y-3">
+                <!-- LIST RUTE -->
                 <div v-if="currentView === 'rute'">
                     <div v-for="(cabangList, shiftName) in groupedRoutes" :key="shiftName" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-4">
                         <div class="bg-[#d4e157] px-3 py-2 border-b border-gray-200"><h3 class="font-bold text-gray-900 text-xs uppercase">{{ shiftName }}</h3></div>
@@ -104,11 +98,17 @@
                     </div>
                 </div>
 
+                <!-- BATCH SUMMARY -->
                 <div v-if="currentView === 'batch'">
                     <div v-for="(batch, index) in rawData" :key="index" @click="goToPicking(batch)" class="clickable-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-4 relative" :class="{'opacity-70': isBatchCompleted(batch['Batch'])}">
+                        
+                        <!-- STEMPEL SELESAI -->
                         <div v-if="isBatchCompleted(batch['Batch'])" class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-                            <div class="bg-emerald-500 text-white font-black px-6 py-2 rounded-lg rotate-[-12deg] border-4 border-emerald-600 shadow-xl text-2xl tracking-widest drop-shadow-md opacity-90">SELESAI</div>
+                            <div class="bg-emerald-500 text-white font-black px-6 py-2 rounded-lg rotate-[-12deg] border-4 border-emerald-600 shadow-xl text-2xl tracking-widest drop-shadow-md opacity-90">
+                                SELESAI
+                            </div>
                         </div>
+
                         <div class="bg-slate-900 text-white px-4 py-3 flex justify-between items-center">
                             <h3 class="font-black text-lg">BATCH {{ batch['Batch'] }}</h3>
                             <span class="text-[9px] font-semibold bg-slate-700 px-2 py-1 rounded-full text-right max-w-[130px] truncate">{{ batch['Shift'] }}</span>
@@ -133,9 +133,11 @@
             </div>
         </div>
 
-        <!-- ================= HALAMAN PICKING ================= -->
+        <!-- ================= HALAMAN PICKING (HIGH DENSITY UI) ================= -->
         <div v-if="currentView === 'picking'" class="flex-1 pb-24 relative z-20">
+            <!-- FREEZE PANEL -->
             <div class="sticky top-0 z-30 flex flex-col shadow-md">
+                <!-- Nav & Progress -->
                 <div class="bg-slate-900 text-white px-3 py-2">
                     <div class="flex items-center justify-between mb-1.5">
                         <button @click="currentView = 'batch'" class="bg-slate-800 px-2 py-1 rounded text-[10px] font-bold flex items-center hover:bg-slate-700">⬅ Batal</button>
@@ -152,6 +154,7 @@
                     </div>
                 </div>
 
+                <!-- Nama Toko Kapsul -->
                 <div v-if="selectedBatchData && !loading" class="bg-white px-2 py-1.5 grid grid-cols-2 gap-1 border-b border-gray-200">
                     <div v-if="selectedBatchData['Toko 1 (merah)'] !== '-'" class="bg-red-50 text-red-900 text-[9px] font-bold px-1.5 py-1 rounded border border-red-200 text-center truncate">{{ selectedBatchData['Toko 1 (merah)'] }}</div>
                     <div v-if="selectedBatchData['Toko 2 (hijau)'] !== '-'" class="bg-emerald-50 text-emerald-900 text-[9px] font-bold px-1.5 py-1 rounded border border-emerald-200 text-center truncate">{{ selectedBatchData['Toko 2 (hijau)'] }}</div>
@@ -159,11 +162,13 @@
                     <div v-if="selectedBatchData['Toko 4 (biru)'] !== '-'" class="bg-blue-50 text-blue-900 text-[9px] font-bold px-1.5 py-1 rounded border border-blue-200 text-center truncate">{{ selectedBatchData['Toko 4 (biru)'] }}</div>
                 </div>
 
+                <!-- Tab Status -->
                 <div v-if="!loading" class="bg-gray-100 flex text-[10px] font-bold border-b border-gray-200">
                     <button @click="activeTab = 'BELUM'" class="flex-1 py-1.5 transition-colors" :class="activeTab === 'BELUM' ? 'bg-white text-emerald-600 border-b-2 border-emerald-500' : 'text-gray-500'">BELUM ({{ pickingData.length - pickedCount }})</button>
                     <button @click="activeTab = 'SELESAI'" class="flex-1 py-1.5 transition-colors" :class="activeTab === 'SELESAI' ? 'bg-white text-emerald-600 border-b-2 border-emerald-500' : 'text-gray-500'">SELESAI ({{ pickedCount }})</button>
                 </div>
 
+                <!-- Search & Kategori Pills -->
                 <div v-if="!loading" class="bg-white p-2 border-b border-gray-200 shadow-sm">
                     <input v-model="searchQuery" type="text" placeholder="🔍 Cari nama barang..." class="w-full bg-gray-50 border border-gray-200 text-xs rounded-md px-3 py-1.5 mb-2 focus:outline-none focus:border-emerald-500">
                     <div class="flex gap-1.5 overflow-x-auto hide-scrollbar pb-0.5">
@@ -177,10 +182,12 @@
                 <p class="text-gray-500 text-sm font-medium">Memuat data...</p>
             </div>
 
-            <!-- DAFTAR KARTU BARANG PICKING -->
+            <!-- DAFTAR KARTU BARANG PADAT -->
             <div v-if="!loading" class="p-2 space-y-2">
                 <div v-for="(item, index) in filteredPickingData" :key="item['Nama Barang']" class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col overflow-hidden" :class="{ 'dimmed': isPicked(item['Nama Barang']) }">
                     <div class="flex">
+                        
+                        <!-- Kiri: Info & Kuantitas -->
                         <div class="p-2 flex-1 border-r border-gray-100 flex flex-col justify-center">
                             <div class="flex justify-between items-center mb-1">
                                 <span class="text-[9px] font-black text-gray-400 uppercase tracking-wider bg-gray-100 px-1.5 py-0.5 rounded">{{ item['Kategori'] }}</span>
@@ -188,7 +195,9 @@
                             </div>
                             <h2 class="text-xs font-bold text-gray-900 leading-tight mb-2">{{ item['Nama Barang'] }}</h2>
                             
+                            <!-- Grid Kuantitas Toko & Tombol Edit -->
                             <div class="flex flex-wrap gap-1 items-stretch">
+                                <!-- Toko 1 -->
                                 <div v-if="item['Toko 1 (merah)'] > 0" class="bg-red-50 text-red-900 border border-red-200 rounded px-1.5 py-0.5 min-w-[26px] text-center flex flex-col justify-center">
                                     <div v-if="!item.editMode">
                                         <span class="text-[11px] font-black block leading-none" :class="{'text-red-300 line-through text-[9px]': item.qtyT1 !== item['Toko 1 (merah)']}">{{ item['Toko 1 (merah)'] }}</span>
@@ -196,6 +205,8 @@
                                     </div>
                                     <div v-else class="flex items-center justify-between gap-1"><button @click.stop="item.qtyT1 > 0 ? item.qtyT1-- : null; saveDraft()" class="bg-red-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT1 }}</span><button @click.stop="item.qtyT1++; saveDraft()" class="bg-red-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
                                 </div>
+                                
+                                <!-- Toko 2 -->
                                 <div v-if="item['Toko 2 (hijau)'] > 0" class="bg-emerald-50 text-emerald-900 border border-emerald-200 rounded px-1.5 py-0.5 min-w-[26px] text-center flex flex-col justify-center">
                                     <div v-if="!item.editMode">
                                         <span class="text-[11px] font-black block leading-none" :class="{'text-emerald-300 line-through text-[9px]': item.qtyT2 !== item['Toko 2 (hijau)']}">{{ item['Toko 2 (hijau)'] }}</span>
@@ -203,6 +214,8 @@
                                     </div>
                                     <div v-else class="flex items-center justify-between gap-1"><button @click.stop="item.qtyT2 > 0 ? item.qtyT2-- : null; saveDraft()" class="bg-emerald-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT2 }}</span><button @click.stop="item.qtyT2++; saveDraft()" class="bg-emerald-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
                                 </div>
+
+                                <!-- Toko 3 -->
                                 <div v-if="item['Toko 3 (kuning)'] > 0" class="bg-yellow-50 text-yellow-900 border border-yellow-300 rounded px-1.5 py-0.5 min-w-[26px] text-center flex flex-col justify-center">
                                     <div v-if="!item.editMode">
                                         <span class="text-[11px] font-black block leading-none" :class="{'text-yellow-400 line-through text-[9px]': item.qtyT3 !== item['Toko 3 (kuning)']}">{{ item['Toko 3 (kuning)'] }}</span>
@@ -210,6 +223,8 @@
                                     </div>
                                     <div v-else class="flex items-center justify-between gap-1"><button @click.stop="item.qtyT3 > 0 ? item.qtyT3-- : null; saveDraft()" class="bg-yellow-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT3 }}</span><button @click.stop="item.qtyT3++; saveDraft()" class="bg-yellow-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
                                 </div>
+
+                                <!-- Toko 4 -->
                                 <div v-if="item['Toko 4 (biru)'] > 0" class="bg-blue-50 text-blue-900 border border-blue-200 rounded px-1.5 py-0.5 min-w-[26px] text-center flex flex-col justify-center">
                                     <div v-if="!item.editMode">
                                         <span class="text-[11px] font-black block leading-none" :class="{'text-blue-300 line-through text-[9px]': item.qtyT4 !== item['Toko 4 (biru)']}">{{ item['Toko 4 (biru)'] }}</span>
@@ -218,6 +233,7 @@
                                     <div v-else class="flex items-center justify-between gap-1"><button @click.stop="item.qtyT4 > 0 ? item.qtyT4-- : null; saveDraft()" class="bg-blue-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT4 }}</span><button @click.stop="item.qtyT4++; saveDraft()" class="bg-blue-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
                                 </div>
                                 
+                                <!-- Tombol Pemicu Laporan Kurang -->
                                 <button v-if="!item.editMode && !isPicked(item['Nama Barang'])" @click.stop="item.editMode = true" class="bg-amber-50 text-amber-600 border border-amber-200 rounded px-1.5 py-0.5 text-[9px] font-bold flex items-center gap-0.5 hover:bg-amber-100 transition-colors ml-1">
                                     ⚠️ Fisik Kurang?
                                 </button>
@@ -227,6 +243,7 @@
                             </div>
                         </div>
 
+                        <!-- Kanan: Tombol AMBIL/BATAL -->
                         <button @click="togglePick(item['Nama Barang'])" class="w-16 flex flex-col items-center justify-center transition-colors" :class="isPicked(item['Nama Barang']) ? 'bg-gray-100 text-gray-400' : 'bg-[#d4e157] hover:bg-[#cddc39] text-slate-800'">
                             <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                             <span class="text-[8px] font-black" v-text="isPicked(item['Nama Barang']) ? 'BATAL' : 'AMBIL'"></span>
@@ -234,234 +251,14 @@
                     </div>
                 </div>
                 
-                <div v-if="filteredPickingData.length === 0" class="text-center py-10 text-gray-400 text-xs font-medium">Tidak ada barang di filter ini.</div>
+                <div v-if="filteredPickingData.length === 0" class="text-center py-10 text-gray-400 text-xs font-medium">
+                    Tidak ada barang di filter ini.
+                </div>
                 
                 <div v-if="filteredPickingData.length > 0 && activeTab === 'BELUM'" class="pt-4 pb-2">
                     <button @click="submitBatch" class="w-full bg-slate-900 text-white font-bold py-3 rounded-lg shadow-lg border border-slate-700 flex items-center justify-center text-xs active:scale-95 transition-transform">
                         ✅ Selesaikan Batch & Lapor
                     </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= MENU 3: PORTAL CHECKER (PC/LAPTOP) ================= -->
-        <div v-if="currentView === 'checker'" class="flex-1 flex flex-col relative z-20 bg-white min-h-screen">
-            <!-- HEADER APP -->
-            <div class="bg-blue-800 text-white p-4 shadow-md flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <button @click="currentView = 'splash'" class="bg-blue-900 px-4 py-2 rounded font-bold hover:bg-blue-700 transition">⬅ Menu Utama</button>
-                    <h2 class="font-black text-xl tracking-wide">PORTAL CHECKER</h2>
-                </div>
-                <button @click="fetchCheckerData" class="bg-emerald-500 px-4 py-2 rounded font-bold hover:bg-emerald-400 text-slate-900 flex items-center gap-2 shadow-sm">
-                    <span>🔄 Tarik Master Data Barcode</span>
-                </button>
-            </div>
-
-            <!-- HEADER ADMINISTRATIF (DENGAN CUSTOM SEARCHABLE DROPDOWN) -->
-            <div class="p-6 border-b border-gray-200 bg-gray-50 grid grid-cols-3 gap-6">
-                <!-- Baris Khusus Tombol Lock -->
-                <div class="col-span-3 flex justify-between items-center bg-gray-200 px-4 py-2 rounded-lg border border-gray-300">
-                    <span class="text-sm font-bold text-gray-600">INFORMASI ADMINISTRATIF</span>
-                    <button @click="isCheckerLocked = !isCheckerLocked" 
-                            class="px-5 py-2 rounded-md font-bold text-sm shadow-sm transition-all flex items-center gap-2"
-                            :class="isCheckerLocked ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'bg-amber-500 text-white hover:bg-amber-600'">
-                        <span v-if="isCheckerLocked">INFO TERKUNCI (Klik untuk Edit)</span>
-                        <span v-else>KUNCI INFO (Simpan & Tampilkan Data)</span>
-                    </button>
-                </div>
-
-                <!-- GUDANG TUJUAN (CUSTOM DROPDOWN) -->
-                <div class="flex flex-col relative">
-                    <label class="text-xs font-bold text-gray-500 mb-1">Gudang Tujuan/Dari</label>
-                    <div class="relative">
-                        <input ref="gudangInput" type="text" v-model="checkerForm.cabang" :disabled="isCheckerLocked" 
-                               @focus="showGudangList = true; $event.target.select()"
-                               @blur="showGudangList = false"
-                               placeholder="Ketik / Pilih Gudang..." 
-                               class="w-full border-2 border-gray-300 p-3 pr-10 rounded font-bold focus:border-blue-500 outline-none uppercase disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
-                        <button v-if="checkerForm.cabang && !isCheckerLocked" @click="checkerForm.cabang = ''; checkerForm.noIt = ''; showGudangList = true; $nextTick(() => $refs.gudangInput.focus())" 
-                                class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 hover:text-red-700 font-black text-xl z-10">✖</button>
-                    </div>
-                    <div v-if="showGudangList && !isCheckerLocked" class="absolute top-[100%] left-0 right-0 bg-white border-2 border-blue-400 mt-1 rounded shadow-xl z-50 max-h-60 overflow-y-auto">
-                        <div v-for="gudang in dynamicGudangList.filter(g => g.toLowerCase().includes(checkerForm.cabang.toLowerCase()))" :key="gudang"
-                             @mousedown.prevent="checkerForm.cabang = gudang; checkerForm.noIt = ''; showGudangList = false"
-                             class="p-3 border-b border-gray-100 hover:bg-blue-100 cursor-pointer font-bold text-sm uppercase">
-                            {{ gudang }}
-                        </div>
-                        <div v-if="dynamicGudangList.filter(g => g.toLowerCase().includes(checkerForm.cabang.toLowerCase())).length === 0" class="p-3 text-gray-500 text-sm font-bold text-center">
-                            Gudang tidak ditemukan
-                        </div>
-                    </div>
-                </div>
-
-                <!-- NO PEMINDAHAN (CUSTOM DROPDOWN) -->
-                <div class="flex flex-col relative">
-                    <label class="text-xs font-bold text-gray-500 mb-1">No. Pemindahan #</label>
-                    <div class="relative">
-                        <input ref="noItInput" type="text" v-model="checkerForm.noIt" :disabled="isCheckerLocked || !checkerForm.cabang" 
-                               @focus="showNoItList = true; $event.target.select()"
-                               @blur="showNoItList = false"
-                               placeholder="Ketik / Pilih No..." 
-                               class="w-full border-2 border-gray-300 p-3 pr-10 rounded font-bold focus:border-blue-500 outline-none uppercase disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
-                        <button v-if="checkerForm.noIt && !isCheckerLocked" @click="checkerForm.noIt = ''; showNoItList = true; $nextTick(() => $refs.noItInput.focus())" 
-                                class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 hover:text-red-700 font-black text-xl z-10">✖</button>
-                    </div>
-                    <div v-if="showNoItList && !isCheckerLocked" class="absolute top-[100%] left-0 right-0 bg-white border-2 border-blue-400 mt-1 rounded shadow-xl z-50 max-h-60 overflow-y-auto">
-                        <div v-for="no in dynamicNoItList.filter(n => n.toLowerCase().includes(checkerForm.noIt.toLowerCase()))" :key="no"
-                             @mousedown.prevent="checkerForm.noIt = no; showNoItList = false"
-                             class="p-3 border-b border-gray-100 hover:bg-blue-100 cursor-pointer font-bold text-sm uppercase">
-                            {{ no }}
-                        </div>
-                        <div v-if="dynamicNoItList.filter(n => n.toLowerCase().includes(checkerForm.noIt.toLowerCase())).length === 0" class="p-3 text-gray-500 text-sm font-bold text-center">
-                            No. IT tidak ditemukan
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex flex-col">
-                    <label class="text-xs font-bold text-gray-500 mb-1">PIC Checker</label>
-                    <input type="text" v-model="checkerForm.pic" :disabled="isCheckerLocked" placeholder="Nama Anda..." 
-                           class="border-2 border-gray-300 p-3 rounded font-bold focus:border-blue-500 outline-none uppercase disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
-                </div>
-                
-                <div class="flex flex-col">
-                    <label class="text-xs font-bold text-gray-500 mb-1">Filter Kategori</label>
-                    <select v-model="checkerFilter.kategori" class="border-2 border-gray-300 p-3 rounded font-bold focus:border-blue-500 outline-none">
-                        <option value="Semua Kategori">Semua Kategori</option>
-                        <option v-for="cat in checkerCategories" :key="cat" :value="cat">{{ cat }}</option>
-                    </select>
-                </div>
-                <div class="flex flex-col">
-                    <label class="text-xs font-bold text-gray-500 mb-1">Filter Status</label>
-                    <select v-model="checkerFilter.status" class="border-2 border-gray-300 p-3 rounded font-bold focus:border-blue-500 outline-none">
-                        <option value="Semua">Semua Item</option>
-                        <option value="Kurang">Belum/Kurang (Kuning)</option>
-                        <option value="Pas">Pas (Hijau)</option>
-                        <option value="Berlebih">Berlebih (Merah)</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- AREA SCAN BARCODE & AUTO-SUGGESTION -->
-            <div class="p-6 bg-blue-100 border-b border-blue-200 grid grid-cols-[3fr_1fr] gap-6 items-end">
-                <div class="flex flex-col relative">
-                    <label class="text-sm font-black text-blue-900 mb-2 flex items-center gap-2">
-                        <span>🔍 Scan / Input Barcode / Item Name</span>
-                        <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded animate-pulse">AUTOFOCUS ON</span>
-                    </label>
-                    <input ref="scanInput" type="text" list="item-suggestions" v-model="currentScan" @keyup.enter="handleScan" placeholder="Tembakkan Barcode Scanner di sini..." 
-                           class="border-4 border-blue-400 p-4 rounded-lg font-black text-xl text-blue-900 focus:border-blue-600 outline-none shadow-inner bg-white">
-                    
-                    <!-- DATALIST UNTUK AUTO-SUGGESTION ITEM -->
-                    <datalist id="item-suggestions">
-                        <option v-for="name in itemSuggestionsList" :key="name" :value="name"></option>
-                    </datalist>
-                </div>
-                <div class="flex flex-col">
-                    <label class="text-sm font-black text-blue-900 mb-2">Kuantitas Ketik (Default 1)</label>
-                    <input type="number" min="1" v-model.number="currentScanQty" 
-                           class="border-4 border-blue-400 p-4 rounded-lg font-black text-xl text-center text-blue-900 focus:border-blue-600 outline-none bg-white">
-                </div>
-            </div>
-
-            <div v-if="loading" class="flex flex-col items-center justify-center p-10">
-                <div class="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mb-3"></div><p class="font-bold text-blue-900">Menyinkronkan Database Barcode...</p>
-            </div>
-
-            <!-- AREA TABEL CHECKER -->
-            <div v-if="!loading" class="flex-1 overflow-auto p-6 bg-white">
-                <table class="w-full checker-table border-collapse">
-                    <thead>
-                        <tr>
-                            <th class="w-1/6">Kategori</th>
-                            <th class="w-1/6">Kode Barang</th>
-                            <th class="w-2/6">Nama Barang</th>
-                            <th class="w-1/12 text-center bg-blue-100">Target / Sisa</th>
-                            <th class="w-1/12 text-center bg-yellow-100">Fisik</th>
-                            <th class="w-1/12 text-center bg-gray-100">Selisih / Aksi</th>
-                        </tr>
-                    </thead>
-                   <tbody>
-                        <tr v-for="item in sortedCheckerItems" :key="item['Kode Barang']" :class="getRowColor(item)">
-                            <td>{{ item['Kategori'] }}</td>
-                            <td class="font-mono text-sm">{{ item['Kode Barang'] }}</td>
-                            <td>{{ item['Nama Barang'] }}</td>
-                            <!-- Kolom Target dikurangi Fisik secara real-time -->
-                            <td class="text-center text-xl font-black bg-white/40">
-                                <span :class="(item['Kuantitas'] || 0) - item['Fisik'] < 0 ? 'text-red-600' : 'text-blue-900'">
-                                    {{ (item['Kuantitas'] || 0) - item['Fisik'] }}
-                                </span>
-                            </td>
-                            <!-- Kolom Fisik dengan Fitur Edit Cepat (+ / -) -->
-                            <td class="text-center bg-white/60">
-                                <div v-if="!item.editMode" @click="item.editMode = true" class="text-xl font-black cursor-pointer hover:bg-yellow-200 py-1 rounded transition" title="Klik untuk edit fisik">
-                                    {{ item['Fisik'] }} ✏️
-                                </div>
-                                <div v-else class="flex items-center justify-center gap-1">
-                                    <button @click="item['Fisik'] > 0 ? item['Fisik']-- : null" class="bg-red-300 px-2 py-0.5 rounded font-bold">-</button>
-                                    <span class="text-lg font-black px-1">{{ item['Fisik'] }}</span>
-                                    <button @click="item['Fisik']++" class="bg-emerald-300 px-2 py-0.5 rounded font-bold">+</button>
-                                    <button @click="item.editMode = false" class="bg-slate-800 text-white px-2 py-0.5 rounded text-xs ml-1">OK</button>
-                                </div>
-                            </td>
-                            <td class="text-center text-xl font-black bg-white/40">
-                                <span :class="item['Fisik'] - (item['Kuantitas'] || 0) < 0 ? 'text-red-600' : (item['Fisik'] - (item['Kuantitas'] || 0) > 0 ? 'text-purple-700' : 'text-emerald-700')">
-                                    {{ item['Fisik'] - (item['Kuantitas'] || 0) }}
-                                </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div v-if="sortedCheckerItems.length === 0" class="text-center p-10 text-gray-400 font-bold">
-                    <p class="text-lg mb-2">Pilih/Ketik <b>Gudang Tujuan/Dari</b> dan <b>No. Pemindahan</b> terlebih dahulu.</p>
-                    <p class="text-sm">Tabel akan otomatis menampilkan barang yang sesuai dengan rute tersebut.</p>
-                </div>
-            </div>
-            
-           <div v-if="currentView === 'checker' && !loading" class="bg-gray-100 p-4 border-t-2 border-gray-300 flex justify-between items-center">
-                <button @click="showRekapModal = true" class="bg-amber-600 text-white px-6 py-3 rounded-lg font-black shadow-lg hover:bg-amber-500 transition-all">
-                    📊 Lihat Rekap Item Selisih
-                </button>
-                <button @click="submitCheckerData" class="bg-blue-800 text-white px-8 py-3 rounded-lg font-black shadow-lg hover:bg-blue-700 transition-all">
-                    💾 SIMPAN HASIL CHECKER
-                </button>
-            </div>
-
-            <!-- MODAL POPUP REKAP SELISIH -->
-            <div v-if="showRekapModal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-6">
-                <div class="bg-white w-full max-w-3xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
-                    <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
-                        <h3 class="font-black text-lg">REKAP ITEM SELISIH (FISIK vs TARGET)</h3>
-                        <button @click="showRekapModal = false" class="text-red-400 font-black text-xl hover:text-white">✕</button>
-                    </div>
-                    <div class="p-6 overflow-y-auto flex-1">
-                        <table class="w-full checker-table">
-                            <thead>
-                                <tr>
-                                    <th>Nama Barang</th>
-                                    <th class="text-center">Target</th>
-                                    <th class="text-center">Fisik</th>
-                                    <th class="text-center">Status Selisih</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="item in rekapSelisihList" :key="item['Kode Barang']">
-                                    <td>{{ item['Nama Barang'] }}</td>
-                                    <td class="text-center font-bold">{{ item['Kuantitas'] || 0 }}</td>
-                                    <td class="text-center font-bold">{{ item['Fisik'] }}</td>
-                                    <td class="text-center font-black" :class="item['Fisik'] - (item['Kuantitas'] || 0) < 0 ? 'text-red-600' : 'text-purple-700'">
-                                        {{ item['Fisik'] - (item['Kuantitas'] || 0) > 0 ? '+' + (item['Fisik'] - (item['Kuantitas'] || 0)) : item['Fisik'] - (item['Kuantitas'] || 0) }}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div v-if="rekapSelisihList.length === 0" class="text-center py-8 text-gray-500 font-bold">
-                            ✅ Luar biasa! Tidak ada item yang selisih (Semua Pas).
-                        </div>
-                    </div>
-                    <div class="bg-gray-100 p-4 text-right">
-                        <button @click="showRekapModal = false" class="bg-slate-800 text-white px-6 py-2 rounded font-bold">Tutup</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -487,42 +284,21 @@
                     currentView: 'splash',
                     menuOpen: false,
                     loading: false,
-                    showRekapModal: false
-                    
-                    // Picker Data
                     rawData: [],
                     selectedBatchData: null,
                     pickingData: [],
                     pickedItems: [],
+                    
+                    // Filter UI State
                     activeTab: 'BELUM',
                     activeCategory: 'Semua',
                     searchQuery: '',
+                    
+                    // Scroll UI
                     showScrollTop: false,
-                    completedBatches: JSON.parse(localStorage.getItem('completedBatches')) || [],
                     
-                    // Checker Data & Auto-Save State
-                    checkerItems: [], 
-                    checkerForm: JSON.parse(localStorage.getItem('checkerForm')) || { cabang: '', noIt: '', pic: '' },
-                    isCheckerLocked: JSON.parse(localStorage.getItem('isCheckerLocked')) || false,
-                    
-                    checkerFilter: { kategori: 'Semua Kategori', status: 'Semua' },
-                    currentScan: '',
-                    currentScanQty: 1,
-                    
-                    // Dropdown UI State
-                    showGudangList: false,
-                    showNoItList: false
-                }
-            },
-            watch: {
-                checkerForm: {
-                    deep: true,
-                    handler(newVal) {
-                        localStorage.setItem('checkerForm', JSON.stringify(newVal));
-                    }
-                },
-                isCheckerLocked(newVal) {
-                    localStorage.setItem('isCheckerLocked', JSON.stringify(newVal));
+                    // Local Storage
+                    completedBatches: JSON.parse(localStorage.getItem('completedBatches')) || []
                 }
             },
             computed: {
@@ -535,15 +311,13 @@
                         if (shift && cabang) {
                             if (!groups[shift]) groups[shift] = [];
                             groups[shift].push(cabang);
-                rekapSelisihList() {
-        if (!this.checkerForm.cabang || !this.checkerForm.noIt) return [];
-        let data = this.checkerItems.filter(i => i['Gudang Tujuan/Dari'] === this.checkerForm.cabang && i['No. Pemindahan #'] === this.checkerForm.noIt);
-        return data.filter(i => i['Fisik'] !== (i['Kuantitas'] || 0));
                         }
                     });
                     return groups;
                 },
-                pickedCount() { return this.pickingData.filter(item => this.isPicked(item['Nama Barang'])).length; },
+                pickedCount() {
+                    return this.pickingData.filter(item => this.isPicked(item['Nama Barang'])).length;
+                },
                 progressPercent() {
                     if (this.pickingData.length === 0) return 0;
                     return Math.round((this.pickedCount / this.pickingData.length) * 100);
@@ -555,124 +329,93 @@
                 },
                 filteredPickingData() {
                     let data = this.pickingData;
-                    if (this.activeTab === 'BELUM') { data = data.filter(item => !this.isPicked(item['Nama Barang'])); } 
-                    else if (this.activeTab === 'SELESAI') { data = data.filter(item => this.isPicked(item['Nama Barang'])); }
-                    if (this.activeCategory !== 'Semua') { data = data.filter(item => item['Kategori'] === this.activeCategory); }
+                    
+                    if (this.activeTab === 'BELUM') {
+                        data = data.filter(item => !this.isPicked(item['Nama Barang']));
+                    } else if (this.activeTab === 'SELESAI') {
+                        data = data.filter(item => this.isPicked(item['Nama Barang']));
+                    }
+                    
+                    if (this.activeCategory !== 'Semua') {
+                        data = data.filter(item => item['Kategori'] === this.activeCategory);
+                    }
+                    
                     if (this.searchQuery.trim() !== '') {
                         const q = this.searchQuery.toLowerCase();
                         data = data.filter(item => item['Nama Barang'].toLowerCase().includes(q));
                     }
+                    
                     return data;
-                },
-                
-                // ==========================================
-                // COMPUTED KHUSUS CHECKER
-                // ==========================================
-                
-                // Dropdown Gudang Tujuan (Unik)
-                dynamicGudangList() {
-                    if (!this.checkerItems.length) return [];
-                    const set = new Set(this.checkerItems.map(i => i['Gudang Tujuan/Dari']));
-                    return Array.from(set).filter(c => c && c.toString().trim() !== '').sort();
-                },
-                // Dropdown No Pemindahan (Cascading: Tergantung Pilihan Gudang)
-                dynamicNoItList() {
-                    if (!this.checkerItems.length || !this.checkerForm.cabang) return [];
-                    const filtered = this.checkerItems.filter(i => i['Gudang Tujuan/Dari'] === this.checkerForm.cabang);
-                    const set = new Set(filtered.map(i => i['No. Pemindahan #']));
-                    return Array.from(set).filter(c => c && c.toString().trim() !== '').sort();
-                },
-                // Dropdown Kategori (Berdasarkan saringan Gudang & No IT)
-                checkerCategories() {
-                    let data = this.checkerItems;
-                    if (this.checkerForm.cabang) { data = data.filter(i => i['Gudang Tujuan/Dari'] === this.checkerForm.cabang); }
-                    if (this.checkerForm.noIt) { data = data.filter(i => i['No. Pemindahan #'] === this.checkerForm.noIt); }
-                    const cats = new Set(data.map(i => i['Kategori']));
-                    return Array.from(cats).filter(c => c && c.toString().trim() !== '');
-                },
-                
-                // AUTO-SUGGEST DATALIST ITEM
-                itemSuggestionsList() {
-                    const names = this.sortedCheckerItems.map(i => i['Nama Barang']);
-                    return Array.from(new Set(names));
-                },
-
-                // Tabel Filtered & Sorted
-               sortedCheckerItems() {
-                    let data = this.checkerItems;
-                    if (!this.checkerForm.cabang || !this.checkerForm.noIt) return [];
-
-                    data = data.filter(i => i['Gudang Tujuan/Dari'] === this.checkerForm.cabang && i['No. Pemindahan #'] === this.checkerForm.noIt);
-                    
-                    if (this.checkerFilter.kategori !== 'Semua Kategori') { data = data.filter(i => i['Kategori'] === this.checkerFilter.kategori); }
-                    
-                    // Filter Status yang Presisi
-                    if (this.checkerFilter.status === 'Kurang') { 
-                        data = data.filter(i => i['Fisik'] < (i['Kuantitas'] || 0)); 
-                    } else if (this.checkerFilter.status === 'Pas') { 
-                        data = data.filter(i => i['Fisik'] === (i['Kuantitas'] || 0)); 
-                    } else if (this.checkerFilter.status === 'Berlebih') { 
-                        data = data.filter(i => i['Fisik'] > (i['Kuantitas'] || 0)); 
-                    }
-                    
-                    return data.sort((a, b) => {
-                        const aSelesai = a['Fisik'] === (a['Kuantitas'] || 0) && a['Kuantitas'] > 0;
-                        const bSelesai = b['Fisik'] === (b['Kuantitas'] || 0) && b['Kuantitas'] > 0;
-                        if (aSelesai && !bSelesai) return 1; 
-                        if (!aSelesai && bSelesai) return -1;
-                        return 0;
-                    });
                 }
             },
-            mounted() { window.addEventListener('scroll', this.handleScroll); },
-            unmounted() { window.removeEventListener('scroll', this.handleScroll); },
+            mounted() {
+                window.addEventListener('scroll', this.handleScroll);
+            },
+            unmounted() {
+                window.removeEventListener('scroll', this.handleScroll);
+            },
             methods: {
-                handleScroll() { this.showScrollTop = window.scrollY > 200; },
-                scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); },
+                handleScroll() {
+                    this.showScrollTop = window.scrollY > 200;
+                },
+                scrollToTop() {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                },
                 openView(viewName) {
                     this.menuOpen = false;
                     this.currentView = viewName;
-                    if(viewName === 'rute' || viewName === 'batch') {
-                        this.fetchData(viewName);
-                    } else if (viewName === 'checker') {
-                        setTimeout(() => { if(this.$refs.scanInput) this.$refs.scanInput.focus(); }, 500);
-                    }
+                    this.fetchData(viewName);
                 },
-                isBatchCompleted(batchNumber) { return this.completedBatches.includes(batchNumber); },
-                
+                isBatchCompleted(batchNumber) {
+                    return this.completedBatches.includes(batchNumber);
+                },
                 async fetchData(actionType) {
                     this.loading = true;
                     this.rawData = [];
                     try {
                         const response = await fetch(`${this.apiUrl}?action=${actionType}`);
                         const result = await response.json();
-                        if (result.status === 'success') { this.rawData = result.data; } 
-                        else { alert(result.message); }
-                    } catch (error) { alert('Gagal terhubung ke server.'); } 
-                    finally { this.loading = false; }
+                        if (result.status === 'success') {
+                            this.rawData = result.data;
+                        } else {
+                            alert(result.message);
+                        }
+                    } catch (error) {
+                        alert('Gagal terhubung ke server.');
+                    } finally {
+                        this.loading = false;
+                    }
                 },
-                
                 async goToPicking(batch) {
                     this.selectedBatchData = batch;
                     this.currentView = 'picking';
                     this.loading = true;
                     this.pickingData = [];
                     this.pickedItems = []; 
+                    
                     this.activeTab = 'BELUM';
                     this.activeCategory = 'Semua';
                     this.searchQuery = '';
+                    
                     window.scrollTo(0, 0);
                     
                     try {
                         const response = await fetch(`${this.apiUrl}?action=detail`);
                         const result = await response.json();
                         if (result.status === 'success') {
-                            const rawItems = result.data.filter(item => item['Batch'] == batch['Batch'] && item['Shift'] == batch['Shift'] && item['Nama Barang'] !== '[DAFTAR TOKO]');
+                            const rawItems = result.data.filter(item => 
+                                item['Batch'] == batch['Batch'] && 
+                                item['Shift'] == batch['Shift'] && 
+                                item['Nama Barang'] !== '[DAFTAR TOKO]'
+                            );
+                            
+                            // Cek apakah ada draft yang tersimpan sebelumnya di memori HP
                             const savedDraft = localStorage.getItem(`draft_batch_${batch['Batch']}_${batch['Shift']}`);
                             
                             if (savedDraft) {
                                 const parsedDraft = JSON.parse(savedDraft);
                                 this.pickedItems = parsedDraft.pickedItems || [];
+                                
                                 this.pickingData = rawItems.map(item => {
                                     const foundSaved = parsedDraft.itemsState.find(s => s.name === item['Nama Barang']);
                                     return {
@@ -694,27 +437,42 @@
                                     qtyT4: parseInt(item['Toko 4 (biru)']) || 0
                                 }));
                             }
-                        } else { alert(result.message); }
-                    } catch (error) { alert('Gagal memuat detail barang.'); } 
-                    finally { this.loading = false; }
+                        } else {
+                            alert(result.message);
+                        }
+                    } catch (error) {
+                        alert('Gagal memuat detail barang.');
+                    } finally {
+                        this.loading = false;
+                    }
                 },
-                
+                // Fungsi Simpan Otomatis Draft ke Memori HP
                 saveDraft() {
                     if (!this.selectedBatchData) return;
                     const draftData = {
                         pickedItems: this.pickedItems,
-                        itemsState: this.pickingData.map(i => ({ name: i['Nama Barang'], qtyT1: i.qtyT1, qtyT2: i.qtyT2, qtyT3: i.qtyT3, qtyT4: i.qtyT4 }))
+                        itemsState: this.pickingData.map(i => ({
+                            name: i['Nama Barang'],
+                            qtyT1: i.qtyT1,
+                            qtyT2: i.qtyT2,
+                            qtyT3: i.qtyT3,
+                            qtyT4: i.qtyT4
+                        }))
                     };
                     localStorage.setItem(`draft_batch_${this.selectedBatchData['Batch']}_${this.selectedBatchData['Shift']}`, JSON.stringify(draftData));
                 },
                 togglePick(itemName) {
                     const index = this.pickedItems.indexOf(itemName);
-                    if (index > -1) { this.pickedItems.splice(index, 1); } 
-                    else { this.pickedItems.push(itemName); }
+                    if (index > -1) {
+                        this.pickedItems.splice(index, 1);
+                    } else {
+                        this.pickedItems.push(itemName);
+                    }
                     this.saveDraft();
                 },
-                isPicked(itemName) { return this.pickedItems.includes(itemName); },
-                
+                isPicked(itemName) {
+                    return this.pickedItems.includes(itemName);
+                },
                 async submitBatch() {
                     let discrepancies = [];
                     this.pickingData.forEach(item => {
@@ -724,9 +482,19 @@
                             { nama: this.selectedBatchData['Toko 3 (kuning)'], qtyAsli: parseInt(item['Toko 3 (kuning)']) || 0, qtyBaru: item.qtyT3 },
                             { nama: this.selectedBatchData['Toko 4 (biru)'], qtyAsli: parseInt(item['Toko 4 (biru)']) || 0, qtyBaru: item.qtyT4 }
                         ];
+                        
                         stores.forEach(s => {
                             if (s.nama !== '-' && s.qtyAsli !== s.qtyBaru) {
-                                discrepancies.push({ batch: this.selectedBatchData['Batch'], shift: this.selectedBatchData['Shift'], kategori: item['Kategori'], nama_barang: item['Nama Barang'], toko: s.nama, qty_seharusnya: s.qtyAsli, qty_aktual: s.qtyBaru, selisih: s.qtyBaru - s.qtyAsli });
+                                discrepancies.push({
+                                    batch: this.selectedBatchData['Batch'],
+                                    shift: this.selectedBatchData['Shift'],
+                                    kategori: item['Kategori'],
+                                    nama_barang: item['Nama Barang'],
+                                    toko: s.nama,
+                                    qty_seharusnya: s.qtyAsli,
+                                    qty_aktual: s.qtyBaru,
+                                    selisih: s.qtyBaru - s.qtyAsli
+                                });
                             }
                         });
                     });
@@ -734,12 +502,21 @@
                     if (discrepancies.length > 0) {
                         this.loading = true;
                         try {
-                            await fetch(this.apiUrl, { method: 'POST', body: JSON.stringify({ reports: discrepancies }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
+                            await fetch(this.apiUrl, {
+                                method: 'POST',
+                                body: JSON.stringify({ reports: discrepancies }),
+                                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                            });
                             alert("✅ Laporan selisih berhasil dikirim ke Spreadsheet!");
-                        } catch(e) { alert("❌ Gagal mengirim laporan."); }
+                        } catch(e) {
+                            alert("❌ Gagal mengirim laporan.");
+                        }
                         this.loading = false;
-                    } else { alert("✅ Batch diselesaikan sempurna tanpa selisih!"); }
+                    } else {
+                        alert("✅ Batch diselesaikan sempurna tanpa selisih!");
+                    }
                     
+                    // Simpan penanda batch selesai & Hapus draft karena sudah tuntas
                     if (!this.completedBatches.includes(this.selectedBatchData['Batch'])) {
                         this.completedBatches.push(this.selectedBatchData['Batch']);
                         localStorage.setItem('completedBatches', JSON.stringify(this.completedBatches));
@@ -748,73 +525,6 @@
                     
                     window.scrollTo(0, 0);
                     this.currentView = 'batch';
-                },
-
-                // ================= FUNGSI KHUSUS CHECKER =================
-                async fetchCheckerData() {
-                    this.loading = true;
-                    try {
-                        const res = await fetch(`${this.apiUrl}?action=checker`);
-                        const result = await res.json();
-                        if (result.status === 'success') {
-                            this.checkerItems = result.data.map(item => ({ ...item, 'Fisik': 0 }));
-                        } else { alert(result.message); }
-                    } catch (e) { alert('Gagal menarik Master Data Barcode.'); } 
-                    finally { 
-                        this.loading = false; 
-                        setTimeout(() => { if(this.$refs.scanInput) this.$refs.scanInput.focus(); }, 100);
-                    }
-                },
-                
-                playSound(type) {
-                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.connect(gain); gain.connect(ctx.destination);
-                    if (type === 'success') { osc.type = 'sine'; osc.frequency.value = 800; } 
-                    else { osc.type = 'sawtooth'; osc.frequency.value = 150; }
-                    osc.start();
-                    gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.3);
-                    osc.stop(ctx.currentTime + 0.3);
-                },
-
-                handleScan() {
-                    if(!this.checkerForm.cabang || !this.checkerForm.noIt) {
-                        this.playSound('error');
-                        alert("⚠️ PILIH GUDANG & NO. PEMINDAHAN TERLEBIH DAHULU!");
-                        this.currentScan = '';
-                        return;
-                    }
-
-                    const scanStr = this.currentScan.trim().toLowerCase();
-                    if (!scanStr) return;
-                    
-                    const foundItem = this.sortedCheckerItems.find(i => 
-                        (i['Kode Barang'] && i['Kode Barang'].toString().toLowerCase() === scanStr) || 
-                        (i['Nama Barang'] && i['Nama Barang'].toString().toLowerCase() === scanStr)
-                    );
-
-                    if (foundItem) {
-                        foundItem['Fisik'] += this.currentScanQty;
-                        if (foundItem['Fisik'] > (foundItem['Kuantitas'] || 0)) { this.playSound('error'); } 
-                        else { this.playSound('success'); }
-                    } else {
-                        this.playSound('error');
-                        alert(`❌ BARANG TIDAK DITEMUKAN PADA RUTE INI!\n\nBarcode/Nama "${this.currentScan}" tidak ada dalam daftar untuk Gudang dan No IT yang Anda pilih saat ini.`);
-                    }
-
-                    this.currentScan = '';
-                    this.currentScanQty = 1;
-                    this.$nextTick(() => { this.$refs.scanInput.focus(); });
-                },
-
-                getRowColor(item) {
-                    const qty = item['Kuantitas'] || 0;
-                    const fisik = item['Fisik'];
-                    if (fisik === 0) return 'row-white';
-                    if (fisik > qty) return 'row-red'; 
-                    if (fisik === qty) return 'row-green'; 
-                    return 'row-yellow'; 
                 }
             }
         }).mount('#app');
