@@ -95,7 +95,6 @@
             </div>
 
             <div v-if="!loading" class="p-3 space-y-3">
-                <!-- LIST RUTE -->
                 <div v-if="currentView === 'rute'">
                     <div v-for="(cabangList, shiftName) in groupedRoutes" :key="shiftName" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-4">
                         <div class="bg-[#d4e157] px-3 py-2 border-b border-gray-200"><h3 class="font-bold text-gray-900 text-xs uppercase">{{ shiftName }}</h3></div>
@@ -105,17 +104,11 @@
                     </div>
                 </div>
 
-                <!-- BATCH SUMMARY -->
                 <div v-if="currentView === 'batch'">
                     <div v-for="(batch, index) in rawData" :key="index" @click="goToPicking(batch)" class="clickable-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-4 relative" :class="{'opacity-70': isBatchCompleted(batch['Batch'])}">
-                        
-                        <!-- STEMPEL SELESAI -->
                         <div v-if="isBatchCompleted(batch['Batch'])" class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-                            <div class="bg-emerald-500 text-white font-black px-6 py-2 rounded-lg rotate-[-12deg] border-4 border-emerald-600 shadow-xl text-2xl tracking-widest drop-shadow-md opacity-90">
-                                SELESAI
-                            </div>
+                            <div class="bg-emerald-500 text-white font-black px-6 py-2 rounded-lg rotate-[-12deg] border-4 border-emerald-600 shadow-xl text-2xl tracking-widest drop-shadow-md opacity-90">SELESAI</div>
                         </div>
-
                         <div class="bg-slate-900 text-white px-4 py-3 flex justify-between items-center">
                             <h3 class="font-black text-lg">BATCH {{ batch['Batch'] }}</h3>
                             <span class="text-[9px] font-semibold bg-slate-700 px-2 py-1 rounded-full text-right max-w-[130px] truncate">{{ batch['Shift'] }}</span>
@@ -140,9 +133,8 @@
             </div>
         </div>
 
-        <!-- ================= HALAMAN PICKING (HIGH DENSITY UI) ================= -->
+        <!-- ================= HALAMAN PICKING ================= -->
         <div v-if="currentView === 'picking'" class="flex-1 pb-24 relative z-20">
-            <!-- FREEZE PANEL -->
             <div class="sticky top-0 z-30 flex flex-col shadow-md">
                 <div class="bg-slate-900 text-white px-3 py-2">
                     <div class="flex items-center justify-between mb-1.5">
@@ -185,7 +177,7 @@
                 <p class="text-gray-500 text-sm font-medium">Memuat data...</p>
             </div>
 
-            <!-- DAFTAR KARTU BARANG -->
+            <!-- DAFTAR KARTU BARANG PICKING -->
             <div v-if="!loading" class="p-2 space-y-2">
                 <div v-for="(item, index) in filteredPickingData" :key="item['Nama Barang']" class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col overflow-hidden" :class="{ 'dimmed': isPicked(item['Nama Barang']) }">
                     <div class="flex">
@@ -265,7 +257,7 @@
                 </button>
             </div>
 
-            <!-- HEADER ADMINISTRATIF (DENGAN FITUR LOCK & DATALIST HISTORY) -->
+            <!-- HEADER ADMINISTRATIF (DENGAN CASCADING DROPDOWN) -->
             <div class="p-6 border-b border-gray-200 bg-gray-50 grid grid-cols-3 gap-6">
                 <!-- Baris Khusus Tombol Lock -->
                 <div class="col-span-3 flex justify-between items-center bg-gray-200 px-4 py-2 rounded-lg border border-gray-300">
@@ -274,21 +266,25 @@
                             class="px-5 py-2 rounded-md font-bold text-sm shadow-sm transition-all flex items-center gap-2"
                             :class="isCheckerLocked ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'bg-amber-500 text-white hover:bg-amber-600'">
                         <span v-if="isCheckerLocked">🔒 INFO TERKUNCI (Klik untuk Edit)</span>
-                        <span v-else>🔓 KUNCI INFO (Simpan)</span>
+                        <span v-else>🔓 KUNCI INFO (Simpan & Tampilkan Data)</span>
                     </button>
                 </div>
 
                 <div class="flex flex-col">
                     <label class="text-xs font-bold text-gray-500 mb-1">Gudang Tujuan/Dari</label>
-                    <input type="text" list="history-cabang" v-model="checkerForm.cabang" :disabled="isCheckerLocked" placeholder="Ketik Gudang..." 
+                    <select v-model="checkerForm.cabang" :disabled="isCheckerLocked" @change="checkerForm.noIt = ''" 
                            class="border-2 border-gray-300 p-3 rounded font-bold focus:border-blue-500 outline-none uppercase disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
-                    <datalist id="history-cabang"><option v-for="c in cabangHistory" :key="c" :value="c"></option></datalist>
+                        <option value="" disabled>-- Pilih Gudang --</option>
+                        <option v-for="gudang in dynamicGudangList" :key="gudang" :value="gudang">{{ gudang }}</option>
+                    </select>
                 </div>
                 <div class="flex flex-col">
                     <label class="text-xs font-bold text-gray-500 mb-1">No. Pemindahan #</label>
-                    <input type="text" list="history-noit" v-model="checkerForm.noIt" :disabled="isCheckerLocked" placeholder="Ketik No. Pemindahan..." 
+                    <select v-model="checkerForm.noIt" :disabled="isCheckerLocked || !checkerForm.cabang" 
                            class="border-2 border-gray-300 p-3 rounded font-bold focus:border-blue-500 outline-none uppercase disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
-                    <datalist id="history-noit"><option v-for="n in noItHistory" :key="n" :value="n"></option></datalist>
+                        <option value="" disabled>-- Pilih No. Pemindahan --</option>
+                        <option v-for="no in dynamicNoItList" :key="no" :value="no">{{ no }}</option>
+                    </select>
                 </div>
                 <div class="flex flex-col">
                     <label class="text-xs font-bold text-gray-500 mb-1">PIC Checker</label>
@@ -364,7 +360,8 @@
                     </tbody>
                 </table>
                 <div v-if="sortedCheckerItems.length === 0" class="text-center p-10 text-gray-400 font-bold">
-                    Silakan tarik Master Data Barcode terlebih dahulu atau ubah filter Anda.
+                    <p class="text-lg mb-2">Pilih <b>Gudang Tujuan/Dari</b> dan <b>No. Pemindahan</b> terlebih dahulu.</p>
+                    <p class="text-sm">Tabel akan otomatis menampilkan barang yang sesuai dengan rute tersebut.</p>
                 </div>
             </div>
             
@@ -412,8 +409,6 @@
                     checkerItems: [], 
                     checkerForm: JSON.parse(localStorage.getItem('checkerForm')) || { cabang: '', noIt: '', pic: '' },
                     isCheckerLocked: JSON.parse(localStorage.getItem('isCheckerLocked')) || false,
-                    cabangHistory: JSON.parse(localStorage.getItem('cabangHistory')) || [],
-                    noItHistory: JSON.parse(localStorage.getItem('noItHistory')) || [],
                     
                     checkerFilter: { kategori: 'Semua Kategori', status: 'Semua' },
                     currentScan: '',
@@ -421,26 +416,14 @@
                 }
             },
             watch: {
-                // Pantau perubahan form dan langsung simpan ke memori laptop
                 checkerForm: {
                     deep: true,
                     handler(newVal) {
                         localStorage.setItem('checkerForm', JSON.stringify(newVal));
                     }
                 },
-                // Pantau gembok & rekam ke history dropdown list
                 isCheckerLocked(newVal) {
                     localStorage.setItem('isCheckerLocked', JSON.stringify(newVal));
-                    if (newVal) {
-                        if (this.checkerForm.cabang && !this.cabangHistory.includes(this.checkerForm.cabang.toUpperCase())) {
-                            this.cabangHistory.push(this.checkerForm.cabang.toUpperCase());
-                            localStorage.setItem('cabangHistory', JSON.stringify(this.cabangHistory));
-                        }
-                        if (this.checkerForm.noIt && !this.noItHistory.includes(this.checkerForm.noIt.toUpperCase())) {
-                            this.noItHistory.push(this.checkerForm.noIt.toUpperCase());
-                            localStorage.setItem('noItHistory', JSON.stringify(this.noItHistory));
-                        }
-                    }
                 }
             },
             computed: {
@@ -479,13 +462,55 @@
                     return data;
                 },
                 
-                // Checker Computed
+                // ==========================================
+                // COMPUTED KHUSUS CHECKER (DATA DRIVEN)
+                // ==========================================
+                
+                // Mendapatkan nama Kolom secara dinamis untuk Gudang (jaga-jaga jika di sheet namanya sedikit berbeda)
+                colGudangName() {
+                    if(!this.checkerItems.length) return 'Gudang Tujuan/Dari';
+                    const keys = Object.keys(this.checkerItems[0]);
+                    return keys.find(k => k.toLowerCase().includes('gudang') || k.toLowerCase().includes('cabang')) || 'Gudang Tujuan/Dari';
+                },
+                // Mendapatkan nama Kolom secara dinamis untuk No Pemindahan
+                colNoItName() {
+                    if(!this.checkerItems.length) return 'No. Pemindahan #';
+                    const keys = Object.keys(this.checkerItems[0]);
+                    return keys.find(k => k.toLowerCase().includes('pemindahan') || k.toLowerCase().includes('it')) || 'No. Pemindahan #';
+                },
+                
+                // 1. Dropdown Gudang Tujuan (Unik)
+                dynamicGudangList() {
+                    if (!this.checkerItems.length) return [];
+                    const set = new Set(this.checkerItems.map(i => i[this.colGudangName]));
+                    return Array.from(set).filter(c => c && c.trim() !== '').sort();
+                },
+                // 2. Dropdown No Pemindahan (Cascading: Tergantung Pilihan Gudang)
+                dynamicNoItList() {
+                    if (!this.checkerItems.length || !this.checkerForm.cabang) return [];
+                    const filtered = this.checkerItems.filter(i => i[this.colGudangName] === this.checkerForm.cabang);
+                    const set = new Set(filtered.map(i => i[this.colNoItName]));
+                    return Array.from(set).filter(c => c && c.trim() !== '').sort();
+                },
+                // 3. Dropdown Kategori (Berdasarkan saringan Gudang & No IT)
                 checkerCategories() {
-                    const cats = new Set(this.checkerItems.map(i => i['Kategori']));
+                    let data = this.checkerItems;
+                    if (this.checkerForm.cabang) { data = data.filter(i => i[this.colGudangName] === this.checkerForm.cabang); }
+                    if (this.checkerForm.noIt) { data = data.filter(i => i[this.colNoItName] === this.checkerForm.noIt); }
+                    const cats = new Set(data.map(i => i['Kategori']));
                     return Array.from(cats).filter(c => c && c.trim() !== '');
                 },
+                // 4. Tabel Filtered & Sorted
                 sortedCheckerItems() {
                     let data = this.checkerItems;
+                    
+                    // Wajib Pilih Gudang & No IT dulu agar tabel tidak kepanjangan
+                    if (!this.checkerForm.cabang || !this.checkerForm.noIt) return [];
+
+                    // Filter by Master Dropdown
+                    data = data.filter(i => i[this.colGudangName] === this.checkerForm.cabang && i[this.colNoItName] === this.checkerForm.noIt);
+                    
+                    // Filter Tambahan UI
                     if (this.checkerFilter.kategori !== 'Semua Kategori') { data = data.filter(i => i['Kategori'] === this.checkerFilter.kategori); }
                     if (this.checkerFilter.status === 'Kurang') { data = data.filter(i => i['Fisik'] < (i['Kuantitas'] || 0)); } 
                     else if (this.checkerFilter.status === 'Pas') { data = data.filter(i => i['Fisik'] === (i['Kuantitas'] || 0) && i['Kuantitas'] > 0); } 
@@ -655,10 +680,19 @@
                 },
 
                 handleScan() {
+                    // Mencegah scan jika gudang dan no pemindahan belum dipilih
+                    if(!this.checkerForm.cabang || !this.checkerForm.noIt) {
+                        this.playSound('error');
+                        alert("⚠️ PILIH GUDANG & NO. PEMINDAHAN TERLEBIH DAHULU!");
+                        this.currentScan = '';
+                        return;
+                    }
+
                     const scanStr = this.currentScan.trim().toLowerCase();
                     if (!scanStr) return;
                     
-                    const foundItem = this.checkerItems.find(i => 
+                    // Mencari barang HANYA pada daftar yang sedang aktif di tabel
+                    const foundItem = this.sortedCheckerItems.find(i => 
                         (i['Kode Barang'] && i['Kode Barang'].toString().toLowerCase() === scanStr) || 
                         (i['Nama Barang'] && i['Nama Barang'].toString().toLowerCase() === scanStr)
                     );
@@ -669,7 +703,7 @@
                         else { this.playSound('success'); }
                     } else {
                         this.playSound('error');
-                        alert(`❌ BARANG TIDAK DITEMUKAN!\n\nBarcode/Nama "${this.currentScan}" tidak terdaftar di database ini.`);
+                        alert(`❌ BARANG TIDAK DITEMUKAN PADA RUTE INI!\n\nBarcode/Nama "${this.currentScan}" tidak ada dalam daftar untuk Gudang dan No IT yang Anda pilih saat ini.`);
                     }
 
                     this.currentScan = '';
