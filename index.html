@@ -9,25 +9,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Press+Start+2P&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <!-- Lottie Player -->
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
         .font-marker { font-family: 'Permanent Marker', cursive; }
         .font-pixel { font-family: 'Press Start 2P', cursive; }
-        
         .bottom-sheet { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .sheet-hidden { transform: translateY(100%); }
         .sheet-visible { transform: translateY(0); }
-        
         .clickable-card { transition: all 0.2s ease; cursor: pointer; }
         .clickable-card:active { transform: scale(0.98); }
-        
         .dimmed { opacity: 0.5; filter: grayscale(80%); } 
-        
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
         .neon-marquee-container {
             width: 100%; overflow: hidden; background-color: #000;
             padding: 15px 0; border-radius: 12px; border: 3px solid #333;
@@ -38,7 +31,6 @@
             font-size: 28px; color: #0f0; text-shadow: 0 0 5px #0f0, 0 0 10px #0f0, 0 0 20px #0f0, 0 0 40px #0f0;
         }
         @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-        
         .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
         .fade-enter-from, .fade-leave-to { opacity: 0; }
     </style>
@@ -46,21 +38,21 @@
 <body class="text-gray-900">
     <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden shadow-2xl bg-slate-50 flex flex-col">
         
-        <!-- ================= SPLASH SCREEN ================= -->
+        <!-- SPLASH SCREEN -->
         <div v-if="currentView === 'splash'" class="flex flex-col items-center justify-center flex-1 p-6 text-center relative z-10 bg-white">
             <h1 class="font-marker text-4xl leading-tight mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">
-                WELLCOME<br><span class="text-black">TO</span><br>PORTAL<br>PICKER
+                WELCOME<br><span class="text-black">TO</span><br>PORTAL<br>PICKER
             </h1>
             <div class="w-full max-w-[280px] mb-8">
                 <div class="neon-marquee-container"><span class="neon-marquee font-pixel">VAPEBOSS</span></div>
             </div>
-            <h2 class="font-marker text-3xl text-black drop-shadow-md mb-12 leading-snug">SEMANGAT KERJA !!!<br>AND<br>LETS THRIVING</h2>
+            <h2 class="font-marker text-3xl text-black drop-shadow-md mb-12 leading-snug">SEMANGAT KERJA !!!<br>AND<br>LET'S THRIVE</h2>
             <button @click="menuOpen = true" class="font-pixel text-xl text-purple-900 bg-gradient-to-r from-yellow-400 via-yellow-300 to-pink-400 px-8 py-4 rounded-full border-4 border-pink-500 shadow-[0_8px_0_rgb(236,72,153)] hover:translate-y-1 transition-all active:shadow-none active:translate-y-2 mt-4">
                 MENU
             </button>
         </div>
 
-        <!-- ================= BOTTOM SHEET ================= -->
+        <!-- BOTTOM SHEET -->
         <div class="absolute inset-0 bg-black/60 z-40 transition-opacity duration-300" :class="menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'" @click="menuOpen = false"></div>
         <div class="bottom-sheet absolute bottom-0 left-0 right-0 bg-[#d4e157] rounded-t-3xl p-8 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.3)]" :class="menuOpen ? 'sheet-visible' : 'sheet-hidden'">
             <div class="w-16 h-1.5 bg-black/20 rounded-full mx-auto mb-8"></div>
@@ -68,13 +60,13 @@
                 <button @click="openView('rute')" class="w-full max-w-[250px] border-y-4 border-red-600 py-3 text-red-600 font-bold text-3xl font-serif tracking-wide hover:bg-black/5 transition-colors">List Rute</button>
                 <button @click="openView('batch')" class="w-full max-w-[250px] border-y-4 border-red-600 py-3 text-red-600 font-bold text-3xl font-serif tracking-wide hover:bg-black/5 transition-colors">Batch Picking</button>
                 
-                <!-- TOMBOL JEMBATAN KE APLIKASI CHECKER -->
-                <button onclick="window.location.href='https://byteandbay.github.io/portal-checker/'" class="w-full max-w-[250px] border-y-4 border-blue-600 py-3 text-blue-600 font-bold text-3xl font-serif tracking-wide hover:bg-black/5 transition-colors">Portal Checker</button>
+                <!-- Buka di Tab Baru agar state picker aman -->
+                <button onclick="window.open('https://byteandbay.github.io/portal-checker/', '_blank')" class="w-full max-w-[250px] border-y-4 border-blue-600 py-3 text-blue-600 font-bold text-3xl font-serif tracking-wide hover:bg-black/5 transition-colors">Portal Checker</button>
             </div>
             <div class="pb-10"></div>
         </div>
 
-        <!-- ================= HALAMAN RUTE / BATCH SUMMARY ================= -->
+        <!-- HALAMAN RUTE / BATCH SUMMARY -->
         <div v-if="currentView === 'rute' || currentView === 'batch'" class="flex-1 pb-20 relative z-20">
             <div class="bg-slate-900 text-white p-3 sticky top-0 z-30 shadow-md flex items-center justify-between">
                 <button @click="currentView = 'splash'" class="bg-slate-800 px-2 py-1.5 rounded text-xs font-bold flex items-center hover:bg-slate-700">⬅ Kembali</button>
@@ -101,14 +93,9 @@
                 <!-- BATCH SUMMARY -->
                 <div v-if="currentView === 'batch'">
                     <div v-for="(batch, index) in rawData" :key="index" @click="goToPicking(batch)" class="clickable-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-4 relative" :class="{'opacity-70': isBatchCompleted(batch['Batch'])}">
-                        
-                        <!-- STEMPEL SELESAI -->
                         <div v-if="isBatchCompleted(batch['Batch'])" class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-                            <div class="bg-emerald-500 text-white font-black px-6 py-2 rounded-lg rotate-[-12deg] border-4 border-emerald-600 shadow-xl text-2xl tracking-widest drop-shadow-md opacity-90">
-                                SELESAI
-                            </div>
+                            <div class="bg-emerald-500 text-white font-black px-6 py-2 rounded-lg rotate-[-12deg] border-4 border-emerald-600 shadow-xl text-2xl tracking-widest drop-shadow-md opacity-90">SELESAI</div>
                         </div>
-
                         <div class="bg-slate-900 text-white px-4 py-3 flex justify-between items-center">
                             <h3 class="font-black text-lg">BATCH {{ batch['Batch'] }}</h3>
                             <span class="text-[9px] font-semibold bg-slate-700 px-2 py-1 rounded-full text-right max-w-[130px] truncate">{{ batch['Shift'] }}</span>
@@ -133,14 +120,13 @@
             </div>
         </div>
 
-        <!-- ================= HALAMAN PICKING (HIGH DENSITY UI) ================= -->
+        <!-- HALAMAN PICKING -->
         <div v-if="currentView === 'picking'" class="flex-1 pb-24 relative z-20">
-            <!-- FREEZE PANEL -->
             <div class="sticky top-0 z-30 flex flex-col shadow-md">
-                <!-- Nav & Progress -->
                 <div class="bg-slate-900 text-white px-3 py-2">
                     <div class="flex items-center justify-between mb-1.5">
-                        <button @click="currentView = 'batch'" class="bg-slate-800 px-2 py-1 rounded text-[10px] font-bold flex items-center hover:bg-slate-700">⬅ Batal</button>
+                        <!-- Konfirmasi Batal -->
+                        <button @click="confirmCancelPicking" class="bg-slate-800 px-2 py-1 rounded text-[10px] font-bold flex items-center hover:bg-slate-700">⬅ Batal</button>
                         <div class="text-right">
                             <h2 class="font-bold text-sm leading-none">Batch {{ selectedBatchData['Batch'] }}</h2>
                             <p class="text-[9px] text-slate-300 truncate max-w-[130px] mt-0.5">{{ selectedBatchData['Shift'] }}</p>
@@ -154,7 +140,6 @@
                     </div>
                 </div>
 
-                <!-- Nama Toko Kapsul -->
                 <div v-if="selectedBatchData && !loading" class="bg-white px-2 py-1.5 grid grid-cols-2 gap-1 border-b border-gray-200">
                     <div v-if="selectedBatchData['Toko 1 (merah)'] !== '-'" class="bg-red-50 text-red-900 text-[9px] font-bold px-1.5 py-1 rounded border border-red-200 text-center truncate">{{ selectedBatchData['Toko 1 (merah)'] }}</div>
                     <div v-if="selectedBatchData['Toko 2 (hijau)'] !== '-'" class="bg-emerald-50 text-emerald-900 text-[9px] font-bold px-1.5 py-1 rounded border border-emerald-200 text-center truncate">{{ selectedBatchData['Toko 2 (hijau)'] }}</div>
@@ -162,13 +147,11 @@
                     <div v-if="selectedBatchData['Toko 4 (biru)'] !== '-'" class="bg-blue-50 text-blue-900 text-[9px] font-bold px-1.5 py-1 rounded border border-blue-200 text-center truncate">{{ selectedBatchData['Toko 4 (biru)'] }}</div>
                 </div>
 
-                <!-- Tab Status -->
                 <div v-if="!loading" class="bg-gray-100 flex text-[10px] font-bold border-b border-gray-200">
                     <button @click="activeTab = 'BELUM'" class="flex-1 py-1.5 transition-colors" :class="activeTab === 'BELUM' ? 'bg-white text-emerald-600 border-b-2 border-emerald-500' : 'text-gray-500'">BELUM ({{ pickingData.length - pickedCount }})</button>
                     <button @click="activeTab = 'SELESAI'" class="flex-1 py-1.5 transition-colors" :class="activeTab === 'SELESAI' ? 'bg-white text-emerald-600 border-b-2 border-emerald-500' : 'text-gray-500'">SELESAI ({{ pickedCount }})</button>
                 </div>
 
-                <!-- Search & Kategori Pills -->
                 <div v-if="!loading" class="bg-white p-2 border-b border-gray-200 shadow-sm">
                     <input v-model="searchQuery" type="text" placeholder="🔍 Cari nama barang..." class="w-full bg-gray-50 border border-gray-200 text-xs rounded-md px-3 py-1.5 mb-2 focus:outline-none focus:border-emerald-500">
                     <div class="flex gap-1.5 overflow-x-auto hide-scrollbar pb-0.5">
@@ -182,22 +165,16 @@
                 <p class="text-gray-500 text-sm font-medium">Memuat data...</p>
             </div>
 
-            <!-- DAFTAR KARTU BARANG PADAT -->
             <div v-if="!loading" class="p-2 space-y-2">
                 <div v-for="(item, index) in filteredPickingData" :key="item['Nama Barang']" class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col overflow-hidden" :class="{ 'dimmed': isPicked(item['Nama Barang']) }">
                     <div class="flex">
-                        
-                        <!-- Kiri: Info & Kuantitas -->
                         <div class="p-2 flex-1 border-r border-gray-100 flex flex-col justify-center">
                             <div class="flex justify-between items-center mb-1">
                                 <span class="text-[9px] font-black text-gray-400 uppercase tracking-wider bg-gray-100 px-1.5 py-0.5 rounded">{{ item['Kategori'] }}</span>
                                 <span class="text-[9px] font-black text-slate-800 bg-[#d4e157] px-1.5 py-0.5 rounded">TOTAL: {{ item.qtyT1 + item.qtyT2 + item.qtyT3 + item.qtyT4 }}</span>
                             </div>
                             <h2 class="text-xs font-bold text-gray-900 leading-tight mb-2">{{ item['Nama Barang'] }}</h2>
-                            
-                            <!-- Grid Kuantitas Toko & Tombol Edit -->
                             <div class="flex flex-wrap gap-1 items-stretch">
-                                <!-- Toko 1 -->
                                 <div v-if="item['Toko 1 (merah)'] > 0" class="bg-red-50 text-red-900 border border-red-200 rounded px-1.5 py-0.5 min-w-[26px] text-center flex flex-col justify-center">
                                     <div v-if="!item.editMode">
                                         <span class="text-[11px] font-black block leading-none" :class="{'text-red-300 line-through text-[9px]': item.qtyT1 !== item['Toko 1 (merah)']}">{{ item['Toko 1 (merah)'] }}</span>
@@ -205,8 +182,6 @@
                                     </div>
                                     <div v-else class="flex items-center justify-between gap-1"><button @click.stop="item.qtyT1 > 0 ? item.qtyT1-- : null; saveDraft()" class="bg-red-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT1 }}</span><button @click.stop="item.qtyT1++; saveDraft()" class="bg-red-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
                                 </div>
-                                
-                                <!-- Toko 2 -->
                                 <div v-if="item['Toko 2 (hijau)'] > 0" class="bg-emerald-50 text-emerald-900 border border-emerald-200 rounded px-1.5 py-0.5 min-w-[26px] text-center flex flex-col justify-center">
                                     <div v-if="!item.editMode">
                                         <span class="text-[11px] font-black block leading-none" :class="{'text-emerald-300 line-through text-[9px]': item.qtyT2 !== item['Toko 2 (hijau)']}">{{ item['Toko 2 (hijau)'] }}</span>
@@ -214,8 +189,6 @@
                                     </div>
                                     <div v-else class="flex items-center justify-between gap-1"><button @click.stop="item.qtyT2 > 0 ? item.qtyT2-- : null; saveDraft()" class="bg-emerald-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT2 }}</span><button @click.stop="item.qtyT2++; saveDraft()" class="bg-emerald-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
                                 </div>
-
-                                <!-- Toko 3 -->
                                 <div v-if="item['Toko 3 (kuning)'] > 0" class="bg-yellow-50 text-yellow-900 border border-yellow-300 rounded px-1.5 py-0.5 min-w-[26px] text-center flex flex-col justify-center">
                                     <div v-if="!item.editMode">
                                         <span class="text-[11px] font-black block leading-none" :class="{'text-yellow-400 line-through text-[9px]': item.qtyT3 !== item['Toko 3 (kuning)']}">{{ item['Toko 3 (kuning)'] }}</span>
@@ -223,8 +196,6 @@
                                     </div>
                                     <div v-else class="flex items-center justify-between gap-1"><button @click.stop="item.qtyT3 > 0 ? item.qtyT3-- : null; saveDraft()" class="bg-yellow-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT3 }}</span><button @click.stop="item.qtyT3++; saveDraft()" class="bg-yellow-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
                                 </div>
-
-                                <!-- Toko 4 -->
                                 <div v-if="item['Toko 4 (biru)'] > 0" class="bg-blue-50 text-blue-900 border border-blue-200 rounded px-1.5 py-0.5 min-w-[26px] text-center flex flex-col justify-center">
                                     <div v-if="!item.editMode">
                                         <span class="text-[11px] font-black block leading-none" :class="{'text-blue-300 line-through text-[9px]': item.qtyT4 !== item['Toko 4 (biru)']}">{{ item['Toko 4 (biru)'] }}</span>
@@ -232,29 +203,17 @@
                                     </div>
                                     <div v-else class="flex items-center justify-between gap-1"><button @click.stop="item.qtyT4 > 0 ? item.qtyT4-- : null; saveDraft()" class="bg-blue-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">-</button><span class="text-[10px] font-black">{{ item.qtyT4 }}</span><button @click.stop="item.qtyT4++; saveDraft()" class="bg-blue-200 rounded text-[10px] w-3 h-3 flex items-center justify-center font-bold">+</button></div>
                                 </div>
-                                
-                                <!-- Tombol Pemicu Laporan Kurang -->
-                                <button v-if="!item.editMode && !isPicked(item['Nama Barang'])" @click.stop="item.editMode = true" class="bg-amber-50 text-amber-600 border border-amber-200 rounded px-1.5 py-0.5 text-[9px] font-bold flex items-center gap-0.5 hover:bg-amber-100 transition-colors ml-1">
-                                    ⚠️ Fisik Kurang?
-                                </button>
-                                <button v-if="item.editMode" @click.stop="item.editMode = false; saveDraft()" class="bg-amber-500 text-white rounded px-2 py-0.5 text-[9px] font-bold flex items-center gap-1 shadow-sm ml-1">
-                                    ✅ Simpan
-                                </button>
+                                <button v-if="!item.editMode && !isPicked(item['Nama Barang'])" @click.stop="item.editMode = true" class="bg-amber-50 text-amber-600 border border-amber-200 rounded px-1.5 py-0.5 text-[9px] font-bold flex items-center gap-0.5 hover:bg-amber-100 transition-colors ml-1">⚠️ Fisik Kurang?</button>
+                                <button v-if="item.editMode" @click.stop="item.editMode = false; saveDraft()" class="bg-amber-500 text-white rounded px-2 py-0.5 text-[9px] font-bold flex items-center gap-1 shadow-sm ml-1">✅ Simpan</button>
                             </div>
                         </div>
-
-                        <!-- Kanan: Tombol AMBIL/BATAL -->
                         <button @click="togglePick(item['Nama Barang'])" class="w-16 flex flex-col items-center justify-center transition-colors" :class="isPicked(item['Nama Barang']) ? 'bg-gray-100 text-gray-400' : 'bg-[#d4e157] hover:bg-[#cddc39] text-slate-800'">
                             <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                             <span class="text-[8px] font-black" v-text="isPicked(item['Nama Barang']) ? 'BATAL' : 'AMBIL'"></span>
                         </button>
                     </div>
                 </div>
-                
-                <div v-if="filteredPickingData.length === 0" class="text-center py-10 text-gray-400 text-xs font-medium">
-                    Tidak ada barang di filter ini.
-                </div>
-                
+                <div v-if="filteredPickingData.length === 0" class="text-center py-10 text-gray-400 text-xs font-medium">Tidak ada barang di filter ini.</div>
                 <div v-if="filteredPickingData.length > 0 && activeTab === 'BELUM'" class="pt-4 pb-2">
                     <button @click="submitBatch" class="w-full bg-slate-900 text-white font-bold py-3 rounded-lg shadow-lg border border-slate-700 flex items-center justify-center text-xs active:scale-95 transition-transform">
                         ✅ Selesaikan Batch & Lapor
@@ -263,15 +222,11 @@
             </div>
         </div>
 
-        <!-- ================= FLOATING BUTTON (SCROLL TO TOP) ================= -->
         <transition name="fade">
-            <button v-if="showScrollTop && (currentView === 'picking' || currentView === 'batch' || currentView === 'rute')" 
-                    @click="scrollToTop" 
-                    class="fixed bottom-6 right-6 bg-[#d4e157] text-slate-800 p-3 rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.3)] z-50 hover:scale-110 transition-transform border-2 border-slate-800">
+            <button v-if="showScrollTop && (currentView === 'picking' || currentView === 'batch' || currentView === 'rute')" @click="scrollToTop" class="fixed bottom-6 right-6 bg-[#d4e157] text-slate-800 p-3 rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.3)] z-50 hover:scale-110 transition-transform border-2 border-slate-800">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"></path></svg>
             </button>
         </transition>
-
     </div>
 
     <script>
@@ -288,16 +243,10 @@
                     selectedBatchData: null,
                     pickingData: [],
                     pickedItems: [],
-                    
-                    // Filter UI State
                     activeTab: 'BELUM',
                     activeCategory: 'Semua',
                     searchQuery: '',
-                    
-                    // Scroll UI
                     showScrollTop: false,
-                    
-                    // Local Storage
                     completedBatches: JSON.parse(localStorage.getItem('completedBatches')) || []
                 }
             },
@@ -315,13 +264,8 @@
                     });
                     return groups;
                 },
-                pickedCount() {
-                    return this.pickingData.filter(item => this.isPicked(item['Nama Barang'])).length;
-                },
-                progressPercent() {
-                    if (this.pickingData.length === 0) return 0;
-                    return Math.round((this.pickedCount / this.pickingData.length) * 100);
-                },
+                pickedCount() { return this.pickingData.filter(item => this.isPicked(item['Nama Barang'])).length; },
+                progressPercent() { return this.pickingData.length === 0 ? 0 : Math.round((this.pickedCount / this.pickingData.length) * 100); },
                 categoriesList() {
                     if (!this.pickingData.length) return ['Semua'];
                     const cats = new Set(this.pickingData.map(item => item['Kategori']));
@@ -329,45 +273,31 @@
                 },
                 filteredPickingData() {
                     let data = this.pickingData;
-                    
-                    if (this.activeTab === 'BELUM') {
-                        data = data.filter(item => !this.isPicked(item['Nama Barang']));
-                    } else if (this.activeTab === 'SELESAI') {
-                        data = data.filter(item => this.isPicked(item['Nama Barang']));
-                    }
-                    
-                    if (this.activeCategory !== 'Semua') {
-                        data = data.filter(item => item['Kategori'] === this.activeCategory);
-                    }
-                    
+                    if (this.activeTab === 'BELUM') data = data.filter(item => !this.isPicked(item['Nama Barang']));
+                    else if (this.activeTab === 'SELESAI') data = data.filter(item => this.isPicked(item['Nama Barang']));
+                    if (this.activeCategory !== 'Semua') data = data.filter(item => item['Kategori'] === this.activeCategory);
                     if (this.searchQuery.trim() !== '') {
                         const q = this.searchQuery.toLowerCase();
                         data = data.filter(item => item['Nama Barang'].toLowerCase().includes(q));
                     }
-                    
                     return data;
                 }
             },
-            mounted() {
-                window.addEventListener('scroll', this.handleScroll);
-            },
-            unmounted() {
-                window.removeEventListener('scroll', this.handleScroll);
-            },
+            mounted() { window.addEventListener('scroll', this.handleScroll); },
+            unmounted() { window.removeEventListener('scroll', this.handleScroll); },
             methods: {
-                handleScroll() {
-                    this.showScrollTop = window.scrollY > 200;
-                },
-                scrollToTop() {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                },
+                handleScroll() { this.showScrollTop = window.scrollY > 200; },
+                scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); },
                 openView(viewName) {
                     this.menuOpen = false;
                     this.currentView = viewName;
                     this.fetchData(viewName);
                 },
-                isBatchCompleted(batchNumber) {
-                    return this.completedBatches.includes(batchNumber);
+                isBatchCompleted(batchNumber) { return this.completedBatches.includes(batchNumber); },
+                confirmCancelPicking() {
+                    if (confirm("Kembali ke daftar batch? Progres yang belum Anda 'Buka Batch' akan tersimpan, namun pastikan Anda tidak salah tekan.")) {
+                        this.currentView = 'batch';
+                    }
                 },
                 async fetchData(actionType) {
                     this.loading = true;
@@ -375,16 +305,10 @@
                     try {
                         const response = await fetch(`${this.apiUrl}?action=${actionType}`);
                         const result = await response.json();
-                        if (result.status === 'success') {
-                            this.rawData = result.data;
-                        } else {
-                            alert(result.message);
-                        }
-                    } catch (error) {
-                        alert('Gagal terhubung ke server.');
-                    } finally {
-                        this.loading = false;
-                    }
+                        if (result.status === 'success') { this.rawData = result.data; } 
+                        else { alert(result.message); }
+                    } catch (error) { alert('Gagal terhubung ke server.'); } 
+                    finally { this.loading = false; }
                 },
                 async goToPicking(batch) {
                     this.selectedBatchData = batch;
@@ -392,30 +316,19 @@
                     this.loading = true;
                     this.pickingData = [];
                     this.pickedItems = []; 
-                    
                     this.activeTab = 'BELUM';
                     this.activeCategory = 'Semua';
                     this.searchQuery = '';
-                    
                     window.scrollTo(0, 0);
-                    
                     try {
                         const response = await fetch(`${this.apiUrl}?action=detail`);
                         const result = await response.json();
                         if (result.status === 'success') {
-                            const rawItems = result.data.filter(item => 
-                                item['Batch'] == batch['Batch'] && 
-                                item['Shift'] == batch['Shift'] && 
-                                item['Nama Barang'] !== '[DAFTAR TOKO]'
-                            );
-                            
-                            // Cek apakah ada draft yang tersimpan sebelumnya di memori HP
+                            const rawItems = result.data.filter(item => item['Batch'] == batch['Batch'] && item['Shift'] == batch['Shift'] && item['Nama Barang'] !== '[DAFTAR TOKO]');
                             const savedDraft = localStorage.getItem(`draft_batch_${batch['Batch']}_${batch['Shift']}`);
-                            
                             if (savedDraft) {
                                 const parsedDraft = JSON.parse(savedDraft);
                                 this.pickedItems = parsedDraft.pickedItems || [];
-                                
                                 this.pickingData = rawItems.map(item => {
                                     const foundSaved = parsedDraft.itemsState.find(s => s.name === item['Nama Barang']);
                                     return {
@@ -437,42 +350,25 @@
                                     qtyT4: parseInt(item['Toko 4 (biru)']) || 0
                                 }));
                             }
-                        } else {
-                            alert(result.message);
-                        }
-                    } catch (error) {
-                        alert('Gagal memuat detail barang.');
-                    } finally {
-                        this.loading = false;
-                    }
+                        } else { alert(result.message); }
+                    } catch (error) { alert('Gagal memuat detail barang.'); } 
+                    finally { this.loading = false; }
                 },
-                // Fungsi Simpan Otomatis Draft ke Memori HP
                 saveDraft() {
                     if (!this.selectedBatchData) return;
                     const draftData = {
                         pickedItems: this.pickedItems,
-                        itemsState: this.pickingData.map(i => ({
-                            name: i['Nama Barang'],
-                            qtyT1: i.qtyT1,
-                            qtyT2: i.qtyT2,
-                            qtyT3: i.qtyT3,
-                            qtyT4: i.qtyT4
-                        }))
+                        itemsState: this.pickingData.map(i => ({ name: i['Nama Barang'], qtyT1: i.qtyT1, qtyT2: i.qtyT2, qtyT3: i.qtyT3, qtyT4: i.qtyT4 }))
                     };
                     localStorage.setItem(`draft_batch_${this.selectedBatchData['Batch']}_${this.selectedBatchData['Shift']}`, JSON.stringify(draftData));
                 },
                 togglePick(itemName) {
                     const index = this.pickedItems.indexOf(itemName);
-                    if (index > -1) {
-                        this.pickedItems.splice(index, 1);
-                    } else {
-                        this.pickedItems.push(itemName);
-                    }
+                    if (index > -1) { this.pickedItems.splice(index, 1); } 
+                    else { this.pickedItems.push(itemName); }
                     this.saveDraft();
                 },
-                isPicked(itemName) {
-                    return this.pickedItems.includes(itemName);
-                },
+                isPicked(itemName) { return this.pickedItems.includes(itemName); },
                 async submitBatch() {
                     let discrepancies = [];
                     this.pickingData.forEach(item => {
@@ -482,18 +378,10 @@
                             { nama: this.selectedBatchData['Toko 3 (kuning)'], qtyAsli: parseInt(item['Toko 3 (kuning)']) || 0, qtyBaru: item.qtyT3 },
                             { nama: this.selectedBatchData['Toko 4 (biru)'], qtyAsli: parseInt(item['Toko 4 (biru)']) || 0, qtyBaru: item.qtyT4 }
                         ];
-                        
                         stores.forEach(s => {
                             if (s.nama !== '-' && s.qtyAsli !== s.qtyBaru) {
                                 discrepancies.push({
-                                    batch: this.selectedBatchData['Batch'],
-                                    shift: this.selectedBatchData['Shift'],
-                                    kategori: item['Kategori'],
-                                    nama_barang: item['Nama Barang'],
-                                    toko: s.nama,
-                                    qty_seharusnya: s.qtyAsli,
-                                    qty_aktual: s.qtyBaru,
-                                    selisih: s.qtyBaru - s.qtyAsli
+                                    batch: this.selectedBatchData['Batch'], shift: this.selectedBatchData['Shift'], kategori: item['Kategori'], nama_barang: item['Nama Barang'], toko: s.nama, qty_seharusnya: s.qtyAsli, qty_aktual: s.qtyBaru, selisih: s.qtyBaru - s.qtyAsli
                                 });
                             }
                         });
@@ -502,27 +390,17 @@
                     if (discrepancies.length > 0) {
                         this.loading = true;
                         try {
-                            await fetch(this.apiUrl, {
-                                method: 'POST',
-                                body: JSON.stringify({ reports: discrepancies }),
-                                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-                            });
+                            await fetch(this.apiUrl, { method: 'POST', body: JSON.stringify({ reports: discrepancies }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
                             alert("✅ Laporan selisih berhasil dikirim ke Spreadsheet!");
-                        } catch(e) {
-                            alert("❌ Gagal mengirim laporan.");
-                        }
+                        } catch(e) { alert("❌ Gagal mengirim laporan."); }
                         this.loading = false;
-                    } else {
-                        alert("✅ Batch diselesaikan sempurna tanpa selisih!");
-                    }
+                    } else { alert("✅ Batch diselesaikan sempurna tanpa selisih!"); }
                     
-                    // Simpan penanda batch selesai & Hapus draft karena sudah tuntas
                     if (!this.completedBatches.includes(this.selectedBatchData['Batch'])) {
                         this.completedBatches.push(this.selectedBatchData['Batch']);
                         localStorage.setItem('completedBatches', JSON.stringify(this.completedBatches));
                     }
                     localStorage.removeItem(`draft_batch_${this.selectedBatchData['Batch']}_${this.selectedBatchData['Shift']}`);
-                    
                     window.scrollTo(0, 0);
                     this.currentView = 'batch';
                 }
