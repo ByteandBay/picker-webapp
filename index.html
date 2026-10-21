@@ -274,7 +274,7 @@
                     <label class="text-xs font-bold text-gray-500 mb-1">Gudang Tujuan/Dari</label>
                     <select v-model="checkerForm.cabang" :disabled="isCheckerLocked" @change="checkerForm.noIt = ''" 
                            class="border-2 border-gray-300 p-3 rounded font-bold focus:border-blue-500 outline-none uppercase disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
-                        <option value="" disabled>-- Pilih Gudang --</option>
+                        <option value="" disabled>-- PILIH GUDANG --</option>
                         <option v-for="gudang in dynamicGudangList" :key="gudang" :value="gudang">{{ gudang }}</option>
                     </select>
                 </div>
@@ -282,7 +282,7 @@
                     <label class="text-xs font-bold text-gray-500 mb-1">No. Pemindahan #</label>
                     <select v-model="checkerForm.noIt" :disabled="isCheckerLocked || !checkerForm.cabang" 
                            class="border-2 border-gray-300 p-3 rounded font-bold focus:border-blue-500 outline-none uppercase disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
-                        <option value="" disabled>-- Pilih No. Pemindahan --</option>
+                        <option value="" disabled>-- PILIH NO. PEMINDAHAN --</option>
                         <option v-for="no in dynamicNoItList" :key="no" :value="no">{{ no }}</option>
                     </select>
                 </div>
@@ -463,42 +463,30 @@
                 },
                 
                 // ==========================================
-                // COMPUTED KHUSUS CHECKER (DATA DRIVEN)
+                // COMPUTED KHUSUS CHECKER (DATA DRIVEN - HARDCODED HEADER)
+                // Mengunci target tepat pada Header yang Anda sampaikan
                 // ==========================================
-                
-                // Mendapatkan nama Kolom secara dinamis untuk Gudang (jaga-jaga jika di sheet namanya sedikit berbeda)
-                colGudangName() {
-                    if(!this.checkerItems.length) return 'Gudang Tujuan/Dari';
-                    const keys = Object.keys(this.checkerItems[0]);
-                    return keys.find(k => k.toLowerCase().includes('gudang') || k.toLowerCase().includes('cabang')) || 'Gudang Tujuan/Dari';
-                },
-                // Mendapatkan nama Kolom secara dinamis untuk No Pemindahan
-                colNoItName() {
-                    if(!this.checkerItems.length) return 'No. Pemindahan #';
-                    const keys = Object.keys(this.checkerItems[0]);
-                    return keys.find(k => k.toLowerCase().includes('pemindahan') || k.toLowerCase().includes('it')) || 'No. Pemindahan #';
-                },
                 
                 // 1. Dropdown Gudang Tujuan (Unik)
                 dynamicGudangList() {
                     if (!this.checkerItems.length) return [];
-                    const set = new Set(this.checkerItems.map(i => i[this.colGudangName]));
-                    return Array.from(set).filter(c => c && c.trim() !== '').sort();
+                    const set = new Set(this.checkerItems.map(i => i['Gudang Tujuan/Dari']));
+                    return Array.from(set).filter(c => c && c.toString().trim() !== '').sort();
                 },
                 // 2. Dropdown No Pemindahan (Cascading: Tergantung Pilihan Gudang)
                 dynamicNoItList() {
                     if (!this.checkerItems.length || !this.checkerForm.cabang) return [];
-                    const filtered = this.checkerItems.filter(i => i[this.colGudangName] === this.checkerForm.cabang);
-                    const set = new Set(filtered.map(i => i[this.colNoItName]));
-                    return Array.from(set).filter(c => c && c.trim() !== '').sort();
+                    const filtered = this.checkerItems.filter(i => i['Gudang Tujuan/Dari'] === this.checkerForm.cabang);
+                    const set = new Set(filtered.map(i => i['No. Pemindahan #']));
+                    return Array.from(set).filter(c => c && c.toString().trim() !== '').sort();
                 },
                 // 3. Dropdown Kategori (Berdasarkan saringan Gudang & No IT)
                 checkerCategories() {
                     let data = this.checkerItems;
-                    if (this.checkerForm.cabang) { data = data.filter(i => i[this.colGudangName] === this.checkerForm.cabang); }
-                    if (this.checkerForm.noIt) { data = data.filter(i => i[this.colNoItName] === this.checkerForm.noIt); }
+                    if (this.checkerForm.cabang) { data = data.filter(i => i['Gudang Tujuan/Dari'] === this.checkerForm.cabang); }
+                    if (this.checkerForm.noIt) { data = data.filter(i => i['No. Pemindahan #'] === this.checkerForm.noIt); }
                     const cats = new Set(data.map(i => i['Kategori']));
-                    return Array.from(cats).filter(c => c && c.trim() !== '');
+                    return Array.from(cats).filter(c => c && c.toString().trim() !== '');
                 },
                 // 4. Tabel Filtered & Sorted
                 sortedCheckerItems() {
@@ -508,7 +496,7 @@
                     if (!this.checkerForm.cabang || !this.checkerForm.noIt) return [];
 
                     // Filter by Master Dropdown
-                    data = data.filter(i => i[this.colGudangName] === this.checkerForm.cabang && i[this.colNoItName] === this.checkerForm.noIt);
+                    data = data.filter(i => i['Gudang Tujuan/Dari'] === this.checkerForm.cabang && i['No. Pemindahan #'] === this.checkerForm.noIt);
                     
                     // Filter Tambahan UI
                     if (this.checkerFilter.kategori !== 'Semua Kategori') { data = data.filter(i => i['Kategori'] === this.checkerFilter.kategori); }
