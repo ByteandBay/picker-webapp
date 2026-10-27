@@ -180,7 +180,7 @@
                         </div>
                     </div>
 
-                    <div v-else-if="hasDraft(batch['Batch'], batch['Shift'])" class="bg-amber-400 text-slate-900 text-[10px] font-black px-3 py-1 text-center uppercase tracking-wider">
+                    <div v-else-if="hasDraft(batch)" class="bg-amber-400 text-slate-900 text-[10px] font-black px-3 py-1 text-center uppercase tracking-wider">
                         Sedang Dikerjakan (Lanjutkan Draft)
                     </div>
 
@@ -366,14 +366,16 @@
                                 {{ item['Nama Barang'] }}
                             </h2>
 
-                            <!-- Kotak Kuantitas Per Toko -->
+                            <!-- Kotak Kuantitas Per Toko (Tampilan Tunggal Jelas, Tanpa Angka Ganda Tumpuk) -->
                             <div class="flex flex-wrap gap-2 items-stretch">
                                 <!-- TOKO 1 -->
-                                <div v-if="item.origT1 > 0" class="bg-red-50 text-red-950 border-2 border-red-200 rounded-xl px-3 py-1.5 min-w-[52px] text-center flex flex-col justify-center shadow-sm">
+                                <div v-if="item.origT1 > 0" class="bg-red-50 text-red-950 border-2 border-red-200 rounded-xl px-3 py-1.5 min-w-[58px] text-center flex flex-col justify-center shadow-sm">
                                     <span class="text-[9px] font-extrabold text-red-500 uppercase leading-none mb-1">TOKO 1</span>
                                     <div v-if="!item.editMode">
-                                        <span class="font-black block leading-none" :class="[fontClasses.storeQty, {'text-red-300 line-through text-xs': item.qtyT1 !== item.origT1}]">{{ item.origT1 }}</span>
-                                        <span v-if="item.qtyT1 !== item.origT1" class="font-black text-red-700 block leading-none mt-1" :class="fontClasses.storeQty">{{ item.qtyT1 }}</span>
+                                        <span class="font-black block leading-none text-red-950" :class="fontClasses.storeQty">{{ item.qtyT1 }}</span>
+                                        <span v-if="item.qtyT1 !== item.origT1" class="text-[9px] font-extrabold text-red-600 bg-red-100 px-1.5 py-0.5 rounded mt-1 inline-block leading-none">
+                                            Target: {{ item.origT1 }}
+                                        </span>
                                     </div>
                                     <div v-else class="flex items-center justify-between gap-2 mt-0.5">
                                         <button @click.stop="adjustQty(item, 'qtyT1', -1)" class="bg-red-200 active:bg-red-300 rounded-lg text-sm w-7 h-7 flex items-center justify-center font-black">-</button>
@@ -383,11 +385,13 @@
                                 </div>
 
                                 <!-- TOKO 2 -->
-                                <div v-if="item.origT2 > 0" class="bg-emerald-50 text-emerald-950 border-2 border-emerald-200 rounded-xl px-3 py-1.5 min-w-[52px] text-center flex flex-col justify-center shadow-sm">
+                                <div v-if="item.origT2 > 0" class="bg-emerald-50 text-emerald-950 border-2 border-emerald-200 rounded-xl px-3 py-1.5 min-w-[58px] text-center flex flex-col justify-center shadow-sm">
                                     <span class="text-[9px] font-extrabold text-emerald-600 uppercase leading-none mb-1">TOKO 2</span>
                                     <div v-if="!item.editMode">
-                                        <span class="font-black block leading-none" :class="[fontClasses.storeQty, {'text-emerald-300 line-through text-xs': item.qtyT2 !== item.origT2}]">{{ item.origT2 }}</span>
-                                        <span v-if="item.qtyT2 !== item.origT2" class="font-black text-emerald-700 block leading-none mt-1" :class="fontClasses.storeQty">{{ item.qtyT2 }}</span>
+                                        <span class="font-black block leading-none text-emerald-950" :class="fontClasses.storeQty">{{ item.qtyT2 }}</span>
+                                        <span v-if="item.qtyT2 !== item.origT2" class="text-[9px] font-extrabold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded mt-1 inline-block leading-none">
+                                            Target: {{ item.origT2 }}
+                                        </span>
                                     </div>
                                     <div v-else class="flex items-center justify-between gap-2 mt-0.5">
                                         <button @click.stop="adjustQty(item, 'qtyT2', -1)" class="bg-emerald-200 active:bg-emerald-300 rounded-lg text-sm w-7 h-7 flex items-center justify-center font-black">-</button>
@@ -397,11 +401,13 @@
                                 </div>
 
                                 <!-- TOKO 3 -->
-                                <div v-if="item.origT3 > 0" class="bg-yellow-50 text-yellow-950 border-2 border-yellow-300 rounded-xl px-3 py-1.5 min-w-[52px] text-center flex flex-col justify-center shadow-sm">
+                                <div v-if="item.origT3 > 0" class="bg-yellow-50 text-yellow-950 border-2 border-yellow-300 rounded-xl px-3 py-1.5 min-w-[58px] text-center flex flex-col justify-center shadow-sm">
                                     <span class="text-[9px] font-extrabold text-yellow-700 uppercase leading-none mb-1">TOKO 3</span>
                                     <div v-if="!item.editMode">
-                                        <span class="font-black block leading-none" :class="[fontClasses.storeQty, {'text-yellow-400 line-through text-xs': item.qtyT3 !== item.origT3}]">{{ item.origT3 }}</span>
-                                        <span v-if="item.qtyT3 !== item.origT3" class="font-black text-yellow-800 block leading-none mt-1" :class="fontClasses.storeQty">{{ item.qtyT3 }}</span>
+                                        <span class="font-black block leading-none text-yellow-950" :class="fontClasses.storeQty">{{ item.qtyT3 }}</span>
+                                        <span v-if="item.qtyT3 !== item.origT3" class="text-[9px] font-extrabold text-yellow-800 bg-yellow-200/80 px-1.5 py-0.5 rounded mt-1 inline-block leading-none">
+                                            Target: {{ item.origT3 }}
+                                        </span>
                                     </div>
                                     <div v-else class="flex items-center justify-between gap-2 mt-0.5">
                                         <button @click.stop="adjustQty(item, 'qtyT3', -1)" class="bg-yellow-200 active:bg-yellow-300 rounded-lg text-sm w-7 h-7 flex items-center justify-center font-black">-</button>
@@ -411,11 +417,13 @@
                                 </div>
 
                                 <!-- TOKO 4 -->
-                                <div v-if="item.origT4 > 0" class="bg-blue-50 text-blue-950 border-2 border-blue-200 rounded-xl px-3 py-1.5 min-w-[52px] text-center flex flex-col justify-center shadow-sm">
+                                <div v-if="item.origT4 > 0" class="bg-blue-50 text-blue-950 border-2 border-blue-200 rounded-xl px-3 py-1.5 min-w-[58px] text-center flex flex-col justify-center shadow-sm">
                                     <span class="text-[9px] font-extrabold text-blue-500 uppercase leading-none mb-1">TOKO 4</span>
                                     <div v-if="!item.editMode">
-                                        <span class="font-black block leading-none" :class="[fontClasses.storeQty, {'text-blue-300 line-through text-xs': item.qtyT4 !== item.origT4}]">{{ item.origT4 }}</span>
-                                        <span v-if="item.qtyT4 !== item.origT4" class="font-black text-blue-700 block leading-none mt-1" :class="fontClasses.storeQty">{{ item.qtyT4 }}</span>
+                                        <span class="font-black block leading-none text-blue-950" :class="fontClasses.storeQty">{{ item.qtyT4 }}</span>
+                                        <span v-if="item.qtyT4 !== item.origT4" class="text-[9px] font-extrabold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded mt-1 inline-block leading-none">
+                                            Target: {{ item.origT4 }}
+                                        </span>
                                     </div>
                                     <div v-else class="flex items-center justify-between gap-2 mt-0.5">
                                         <button @click.stop="adjustQty(item, 'qtyT4', -1)" class="bg-blue-200 active:bg-blue-300 rounded-lg text-sm w-7 h-7 flex items-center justify-center font-black">-</button>
@@ -425,7 +433,7 @@
                                 </div>
 
                                 <!-- Tombol Buka / Simpan Edit Fisik Kurang -->
-                                <button v-if="!item.editMode && !isPicked(item['Nama Barang'])" @click.stop="item.editMode = true" class="bg-amber-50 text-amber-800 border border-amber-300 rounded-xl px-2.5 py-1.5 text-[10px] font-extrabold flex items-center gap-1 hover:bg-amber-100 transition-colors ml-auto self-center">
+                                <button v-if="!item.editMode && !isPicked(item['Nama Barang'])" @click.stop="openEditQtyItem(item)" class="bg-amber-50 text-amber-800 border border-amber-300 rounded-xl px-2.5 py-1.5 text-[10px] font-extrabold flex items-center gap-1 hover:bg-amber-100 transition-colors ml-auto self-center">
                                     Fisik Kurang?
                                 </button>
                                 <div v-if="item.editMode" class="flex items-center gap-1.5 ml-auto self-center">
@@ -588,7 +596,7 @@
                 return {
                     apiUrl: 'https://script.google.com/macros/s/AKfycbw-Hlly2gks4HjfRIdD0xL3l7Uhc7I-R2dRaGWYgFMY7qkhRWOYLcSQuEuqHCMLnnsL/exec',
                     spreadsheetId: '1P_knQDuxqglhl0NSiqFrcsAH5aQC9m8gDWCgrWHZKCM',
-                    currentView: 'batch', // Langsung ke Daftar Batch di Portal B (Tidak bertabrakan dengan Homepage/Rute di Portal A)
+                    currentView: 'batch',
                     menuOpen: false,
                     showConfigModal: false,
                     loading: false,
@@ -598,7 +606,6 @@
                     
                     fontScale: savedFontScale,
 
-                    // Data Batch & Cache Detail per Batch (Zero Unnecessary Refresh)
                     rawData: [],
                     batchDetailsCache: {},
                     selectedShiftFilter: 'Semua Shift',
@@ -771,6 +778,7 @@
             },
             mounted() {
                 window.addEventListener('scroll', this.handleScroll);
+                this.purgeLegacyDrafts();
                 this.loadKuantitasMaster();
                 this.fetchBatchData(false);
             },
@@ -778,6 +786,32 @@
                 window.removeEventListener('scroll', this.handleScroll);
             },
             methods: {
+                // Hapus draft versi lama yang tidak menyimpan signature toko / origT1..T4 agar tidak memicu angka 0 palsu saat ganti pembagian 2, 3, 4 toko
+                purgeLegacyDrafts() {
+                    try {
+                        const keysToRemove = [];
+                        for (let i = 0; i < localStorage.length; i++) {
+                            const k = localStorage.key(i);
+                            if (k && k.startsWith('draft_batch_')) {
+                                keysToRemove.push(k);
+                            }
+                        }
+                        keysToRemove.forEach(k => localStorage.removeItem(k));
+                    } catch (e) {}
+                },
+                getBatchSignature(batch) {
+                    if (!batch) return '';
+                    const b = String(batch['Batch'] || '').trim();
+                    const s = String(batch['Shift'] || '').trim();
+                    const t1 = String(batch['Toko 1 (merah)'] || '-').trim();
+                    const t2 = String(batch['Toko 2 (hijau)'] || '-').trim();
+                    const t3 = String(batch['Toko 3 (kuning)'] || '-').trim();
+                    const t4 = String(batch['Toko 4 (biru)'] || '-').trim();
+                    return `${b}__${s}__${t1}__${t2}__${t3}__${t4}`;
+                },
+                getDraftStorageKey(batch) {
+                    return `draft_v3_${this.getBatchSignature(batch)}`;
+                },
                 notify(type, title, message = '') {
                     const id = Date.now() + Math.random();
                     this.toasts.push({ id, type, title, message });
@@ -810,7 +844,6 @@
                         localStorage.setItem('vapeboss_picker_name', this.pickerName.trim());
                     } catch (e) {}
                 },
-                // Bersihkan salah ketik nama tanpa reload halaman
                 clearPickerName() {
                     this.pickerName = '';
                     this.savePickerName();
@@ -856,14 +889,13 @@
                 isBatchCompleted(batchNumber, shiftName) {
                     return this.completedBatches.includes(this.batchKey(batchNumber, shiftName));
                 },
-                hasDraft(batchNumber, shiftName) {
+                hasDraft(batch) {
                     try {
-                        return !!localStorage.getItem(`draft_batch_${batchNumber}_${shiftName}`);
+                        return !!localStorage.getItem(this.getDraftStorageKey(batch));
                     } catch (e) {
                         return false;
                     }
                 },
-                // Kembali ke daftar batch secara instan tanpa memuat ulang dari server
                 returnToBatchList() {
                     this.currentView = 'batch';
                     window.scrollTo(0, 0);
@@ -923,8 +955,8 @@
                         if (result.status === 'success') {
                             this.rawData = result.data || [];
                             if (showNotif) {
-                                // Bersihkan cache detail agar penarikan baru mengambil item terbaru juga
                                 this.batchDetailsCache = {};
+                                this.purgeLegacyDrafts();
                                 this.notify('success', 'Data Batch Diperbarui', `${this.rawData.length} batch berhasil ditarik dari Spreadsheet.`);
                             }
                             if (Array.isArray(result.completed_batches)) {
@@ -943,11 +975,24 @@
                         this.loading = false;
                     }
                 },
+                resolveStoreDraftQty(savedItem, qtyKey, origKey, currentOrig) {
+                    if (!savedItem || !savedItem.isDiscrepant) return currentOrig;
+                    const savedOrig = Number(savedItem[origKey]);
+                    const savedQty = Number(savedItem[qtyKey]);
+                    if (isNaN(savedOrig) || isNaN(savedQty)) return currentOrig;
+                    if (savedOrig !== currentOrig) return currentOrig;
+                    if (savedQty < 0 || savedQty > currentOrig) return currentOrig;
+                    return savedQty;
+                },
                 hydrateBatchItems(batch, rawItems) {
                     let parsedDraft = null;
+                    const expectedSig = this.getBatchSignature(batch);
                     try {
-                        const savedDraft = localStorage.getItem(`draft_batch_${batch['Batch']}_${batch['Shift']}`);
-                        parsedDraft = savedDraft ? JSON.parse(savedDraft) : null;
+                        const savedDraft = localStorage.getItem(this.getDraftStorageKey(batch));
+                        const candidate = savedDraft ? JSON.parse(savedDraft) : null;
+                        if (candidate && candidate.signature === expectedSig) {
+                            parsedDraft = candidate;
+                        }
                     } catch (e) {}
 
                     this.pickedItems = parsedDraft ? (parsedDraft.pickedItems || []) : [];
@@ -966,17 +1011,24 @@
 
                         const foundSaved = parsedDraft?.itemsState?.find(s => s.name === nama);
 
+                        const qtyT1 = this.resolveStoreDraftQty(foundSaved, 'qtyT1', 'origT1', origT1);
+                        const qtyT2 = this.resolveStoreDraftQty(foundSaved, 'qtyT2', 'origT2', origT2);
+                        const qtyT3 = this.resolveStoreDraftQty(foundSaved, 'qtyT3', 'origT3', origT3);
+                        const qtyT4 = this.resolveStoreDraftQty(foundSaved, 'qtyT4', 'origT4', origT4);
+
+                        const stillHasDiscrepancy = (qtyT1 !== origT1 || qtyT2 !== origT2 || qtyT3 !== origT3 || qtyT4 !== origT4);
+
                         return {
                             ...item,
                             'Kategori': kategoriResolved,
                             'Kode Barang': kodeResolved,
                             origT1, origT2, origT3, origT4,
                             editMode: false,
-                            qtyT1: foundSaved ? foundSaved.qtyT1 : origT1,
-                            qtyT2: foundSaved ? foundSaved.qtyT2 : origT2,
-                            qtyT3: foundSaved ? foundSaved.qtyT3 : origT3,
-                            qtyT4: foundSaved ? foundSaved.qtyT4 : origT4,
-                            alasanKurang: foundSaved ? (foundSaved.alasanKurang || '') : ''
+                            qtyT1,
+                            qtyT2,
+                            qtyT3,
+                            qtyT4,
+                            alasanKurang: stillHasDiscrepancy && foundSaved ? (foundSaved.alasanKurang || '') : ''
                         };
                     });
                 },
@@ -1000,10 +1052,9 @@
                     this.searchQuery = '';
                     window.scrollTo(0, 0);
 
-                    const bKey = this.batchKey(batch['Batch'], batch['Shift']);
-                    // Jika data detail batch ini sudah pernah ditarik, langsung tampilkan dari memori tanpa loading ulang!
-                    if (this.batchDetailsCache[bKey]) {
-                        this.hydrateBatchItems(batch, this.batchDetailsCache[bKey]);
+                    const cacheKey = this.getBatchSignature(batch);
+                    if (this.batchDetailsCache[cacheKey]) {
+                        this.hydrateBatchItems(batch, this.batchDetailsCache[cacheKey]);
                         return;
                     }
 
@@ -1028,7 +1079,7 @@
                                 String(item['Shift']) === String(batch['Shift']) && 
                                 item['Nama Barang'] !== '[DAFTAR TOKO]'
                             );
-                            this.batchDetailsCache[bKey] = rawItems;
+                            this.batchDetailsCache[cacheKey] = rawItems;
                             this.hydrateBatchItems(batch, rawItems);
                         } else {
                             this.notify('error', 'Gagal Memuat Detail', result.message);
@@ -1050,9 +1101,19 @@
                     this.activeStoreFilter = 'ALL';
                     this.searchQuery = '';
                 },
+                openEditQtyItem(item) {
+                    item.editMode = true;
+                },
                 adjustQty(item, key, delta) {
+                    const origKeyMap = {
+                        qtyT1: 'origT1',
+                        qtyT2: 'origT2',
+                        qtyT3: 'origT3',
+                        qtyT4: 'origT4'
+                    };
+                    const maxOrig = item[origKeyMap[key]] || 0;
                     const nextVal = item[key] + delta;
-                    if (nextVal >= 0) {
+                    if (nextVal >= 0 && nextVal <= maxOrig) {
                         item[key] = nextVal;
                         if (!this.hasDiscrepancy(item)) {
                             item.alasanKurang = '';
@@ -1060,7 +1121,6 @@
                         this.saveDraft();
                     }
                 },
-                // Kembalikan kuantitas ke angka awal tanpa reload halaman
                 resetQtyItem(item) {
                     item.qtyT1 = item.origT1;
                     item.qtyT2 = item.origT2;
@@ -1107,19 +1167,27 @@
                 saveDraft() {
                     if (!this.selectedBatchData) return;
                     const draftData = {
+                        signature: this.getBatchSignature(this.selectedBatchData),
                         pickedItems: this.pickedItems,
                         pickedTimestamps: this.pickedTimestamps,
-                        itemsState: this.pickingData.map(i => ({
-                            name: i['Nama Barang'],
-                            qtyT1: i.qtyT1,
-                            qtyT2: i.qtyT2,
-                            qtyT3: i.qtyT3,
-                            qtyT4: i.qtyT4,
-                            alasanKurang: i.alasanKurang
-                        }))
+                        itemsState: this.pickingData
+                            .filter(i => this.hasDiscrepancy(i))
+                            .map(i => ({
+                                name: i['Nama Barang'],
+                                isDiscrepant: true,
+                                origT1: i.origT1,
+                                origT2: i.origT2,
+                                origT3: i.origT3,
+                                origT4: i.origT4,
+                                qtyT1: i.qtyT1,
+                                qtyT2: i.qtyT2,
+                                qtyT3: i.qtyT3,
+                                qtyT4: i.qtyT4,
+                                alasanKurang: i.alasanKurang
+                            }))
                     };
                     try {
-                        localStorage.setItem(`draft_batch_${this.selectedBatchData['Batch']}_${this.selectedBatchData['Shift']}`, JSON.stringify(draftData));
+                        localStorage.setItem(this.getDraftStorageKey(this.selectedBatchData), JSON.stringify(draftData));
                     } catch (e) {}
                 },
                 togglePick(item) {
@@ -1288,7 +1356,7 @@
                             } catch (e) {}
                         }
                         try {
-                            localStorage.removeItem(`draft_batch_${this.selectedBatchData['Batch']}_${this.selectedBatchData['Shift']}`);
+                            localStorage.removeItem(this.getDraftStorageKey(this.selectedBatchData));
                         } catch (e) {}
 
                         if (discrepancies.length > 0) {
